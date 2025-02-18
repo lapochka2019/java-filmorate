@@ -159,7 +159,7 @@ public class FilmControllerTest {
                 "\"releaseDate\" : \"1999-01-01\",\n" +
                 "\"duration\" : 150}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films/1") // URL вашего эндпоинта
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films") // URL вашего эндпоинта
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonFilm))
                 .andExpect(status().isOk()) // Ожидаем статус 200 (OK)
@@ -183,7 +183,7 @@ public class FilmControllerTest {
                 "\"releaseDate\" : \"1999-01-01\",\n" +
                 "\"duration\" : 150}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films/5") // URL вашего эндпоинта
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films") // URL вашего эндпоинта
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonFilm))
                 .andExpect(status().isNotFound())
@@ -204,7 +204,7 @@ public class FilmControllerTest {
                 "\"releaseDate\" : \"1999-01-01\",\n" +
                 "\"duration\" : 150}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonFilm))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
@@ -225,7 +225,7 @@ public class FilmControllerTest {
                 "\"releaseDate\" : \"1844-01-01\",\n" +
                 "\"duration\" : 150}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonFilm))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
@@ -246,7 +246,7 @@ public class FilmControllerTest {
                 "\"releaseDate\" : \"1999-01-01\",\n" +
                 "\"duration\" : -150}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonFilm))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)

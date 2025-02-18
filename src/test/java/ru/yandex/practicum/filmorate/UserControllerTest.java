@@ -197,7 +197,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1") // URL вашего эндпоинта
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users") // URL вашего эндпоинта
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isOk()) // Ожидаем статус 200 (OK)
@@ -221,7 +221,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/2") // URL вашего эндпоинта
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users") // URL вашего эндпоинта
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isNotFound())
@@ -242,7 +242,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
@@ -263,7 +263,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
@@ -284,7 +284,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
@@ -306,7 +306,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
@@ -327,7 +327,7 @@ public class UserControllerTest {
                 "    \"name\": \"\",\n" +
                 "    \"birthday\": \"1990-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isOk()) //
@@ -350,7 +350,7 @@ public class UserControllerTest {
                 "    \"name\": \"User Name\",\n" +
                 "    \"birthday\": \"2027-01-01\"}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUser))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)

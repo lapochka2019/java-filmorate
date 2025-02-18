@@ -33,7 +33,7 @@ public class FilmController {
     }
 
     //    обновление фильма
-    @PutMapping("/{id}")
+    @PutMapping()
     public ResponseEntity<?> updateFilm(@Valid @RequestBody Film film) {
         //Не стала делать проверку на пустую сущность
         //так как предусмотрена валидация и хоть какие-то данные должны быть

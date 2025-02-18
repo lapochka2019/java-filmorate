@@ -38,7 +38,7 @@ public class UserController {
     }
 
     //    обновление пользователей
-    @PutMapping("/{id}")
+    @PutMapping()
     public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
         //Не стала делать проверку на пустую сущность
         //так как предусмотрена валидация и хоть какие-то данные должны быть
@@ -62,7 +62,7 @@ public class UserController {
 
     //заполнить имя пользователя
     private void putUserName(User user) {
-        if (user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
             log.info("Имя пользователя заполнено, как логин");
         }
