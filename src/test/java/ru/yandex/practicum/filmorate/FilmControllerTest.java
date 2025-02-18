@@ -223,10 +223,17 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
 
-        assertEquals(404, result.getResponse().getStatus(), "Статус код должен быть 404 (Not Found)");
-        assertEquals(responseContent, "Такой фильм не найден!", "Тело ответа не должно быть null");
+        // Проверяем поля ответа
+        assertEquals(404, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("Такой фильм не найден!", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить фильм. Пустое название")

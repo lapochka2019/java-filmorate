@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class FilmController {
         //проверяем, что такой пользователь уже есть в "БД" и
         if (!films.containsKey(film.getId())) {
             log.warn("Попытка изменить фильм, который еще не создан");
-            return new ResponseEntity<>("Такой фильм не найден!", HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Такой фильм не найден!");
         }
         log.info("Успешно обновлен фильм: {}", film);
         films.put(film.getId(), film);

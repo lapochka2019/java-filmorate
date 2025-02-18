@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class UserController {
         //проверяем, что такой пользователь уже есть в "БД" и
         if (!users.containsKey(user.getId())) {
             log.warn("Попытка обновить несуществующего пользователя");
-            return new ResponseEntity<>("Такой пользователь не найден!", HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Такой пользователь не найден!");
         }
         putUserName(user);
         log.info("Успешное обновление пользователя: {}", user);
