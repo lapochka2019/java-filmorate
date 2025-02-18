@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,9 +81,17 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "email: Поле \"email\" не может быть пустым", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("email: Поле \"email\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Создать пользователя. Некорректный email")
@@ -99,12 +109,20 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "email: Это не похоже на email", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("email: Это не похоже на email", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
-    @DisplayName("Тест: Создать пользователя. Пустой логин")
+    @DisplayName("Тест: Создать пользователя. Логин с пробелами")
     @Test
     void testCreateUser_InvalidLogin() throws Exception {
         String jsonUser = "{\"email\": \"mail@mail.ru\",\n" +
@@ -119,13 +137,20 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
 
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "login: Поле не должно содержать пробелов", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("login: Поле не должно содержать пробелов", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
-    @DisplayName("Тест: Создать пользователя. Логин с пробелами")
+    @DisplayName("Тест: Создать пользователя. Пустой логин")
     @Test
     void testCreateUser_EmptyLogin() throws Exception {
         String jsonUser = "{\"email\": \"mail@mail.ru\",\n" +
@@ -140,9 +165,17 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "login: Поле \"Логин\" не может быть пустым", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("login: Поле \"Логин\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Создать пользователя. Пустое имя")
@@ -182,9 +215,17 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "birthday: Дата рождения не может быть в будущем", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("birthday: Дата рождения не может быть в будущем", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     /*Обновить пользователя*/
@@ -249,9 +290,17 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "email: Поле \"email\" не может быть пустым", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("email: Поле \"email\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить пользователя. Некорректный email")
@@ -270,36 +319,22 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "email: Это не похоже на email", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("email: Это не похоже на email", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить пользователя. Пустой логин")
     @Test
-    void testUpdateeUser_InvalidLogin() throws Exception {
-        String jsonUser = "{ \"id\": \"1\",\n" +
-                "    \"email\": \"correct@mail.ru\",\n" +
-                "    \"login\": \"Log In\",\n" +
-                "    \"name\": \"User Name\",\n" +
-                "    \"birthday\": \"1990-01-01\"}";
-
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonUser))
-                .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
-                .andReturn();
-
-
-        String responseContent = result.getResponse().getContentAsString();
-
-        assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "login: Поле не должно содержать пробелов", "Тело ответа не должно быть null");
-    }
-
-    @DisplayName("Тест: Обновить пользователя. Логин с пробелами")
-    @Test
-    void testUpdateUser_EmptyLogin() throws Exception {
+    void testUpdateUser_InvalidLogin() throws Exception {
         String jsonUser = "{ \"id\": \"1\",\n" +
                 "    \"email\": \"correct@mail.ru\",\n" +
                 "    \"login\": \"\",\n" +
@@ -313,9 +348,46 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "login: Поле \"Логин\" не может быть пустым", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("login: Поле \"Логин\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
+    }
+
+    @DisplayName("Тест: Обновить пользователя. Логин с пробелами")
+    @Test
+    void testUpdateUser_EmptyLogin() throws Exception {
+        String jsonUser = "{ \"id\": \"1\",\n" +
+                "    \"email\": \"correct@mail.ru\",\n" +
+                "    \"login\": \"Log In\",\n" +
+                "    \"name\": \"User Name\",\n" +
+                "    \"birthday\": \"1990-01-01\"}";
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonUser))
+                .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
+                .andReturn();
+
+
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
+        assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("login: Поле не должно содержать пробелов", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить пользователя. Пустое имя")
@@ -357,9 +429,17 @@ public class UserControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "birthday: Дата рождения не может быть в будущем", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("birthday: Дата рождения не может быть в будущем", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     /*Получить список пользователей*/

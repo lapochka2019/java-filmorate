@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,10 +81,17 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 (BAD_REQUEST)
                 .andReturn();
 
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "name: Поле \"Имя\" не может быть пустым", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("name: Поле \"Имя\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Создать фильм. Длинное описание")
@@ -104,9 +113,17 @@ public class FilmControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "description: Длина описания не должна превышать 200 символов", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("description: Длина описания не должна превышать 200 символов", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Создать фильм. Ранняя дата выхода фильма")
@@ -124,9 +141,18 @@ public class FilmControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "releaseDate: Фильм не может быть снять раньше 28 декабря 1895 года", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+
+        assertEquals("releaseDate: Фильм не может быть снять раньше 28 декабря 1895 года", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Создать фильм. Отрицательная продолжительность")
@@ -144,9 +170,17 @@ public class FilmControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "duration: Продолжительность фильма должна быть положительным числом", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("duration: Продолжительность фильма должна быть положительным числом", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     /*Обновить фильм*/
@@ -211,9 +245,17 @@ public class FilmControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "name: Поле \"Имя\" не может быть пустым", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("name: Поле \"Имя\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить фильм. Ранняя дата выхода")
@@ -232,9 +274,18 @@ public class FilmControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "releaseDate: Фильм не может быть снять раньше 28 декабря 1895 года", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+
+        assertEquals("releaseDate: Фильм не может быть снять раньше 28 декабря 1895 года", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить фильм. Отрицательная продолжительность")
@@ -253,9 +304,17 @@ public class FilmControllerTest {
                 .andReturn();
 
 
-        String responseContent = result.getResponse().getContentAsString();
+        // Получаем тело ответа
+        String responseContent = new String(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        // Преобразуем JSON-ответ в объект Map
+        JsonNode responseJson = objectMapper.readTree(responseContent);
+
+        // Проверяем поля ответа
         assertEquals(400, result.getResponse().getStatus(), "Статус код должен быть 400 (BAD_REQUEST)");
-        assertEquals(responseContent, "duration: Продолжительность фильма должна быть положительным числом", "Тело ответа не должно быть null");
+
+        // Проверяем список ошибок
+        JsonNode errors = responseJson.get("errors");
+        assertEquals("duration: Продолжительность фильма должна быть положительным числом", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     /*Получить все фильмы*/
