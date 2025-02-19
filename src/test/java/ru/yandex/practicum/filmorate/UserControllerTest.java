@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class) // Аннотация для тестирования веб-контроллера
@@ -147,7 +148,7 @@ public class UserControllerTest {
 
         // Проверяем список ошибок
         JsonNode errors = responseJson.get("errors");
-        assertEquals("login: Поле не должно содержать пробелов", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
+        assertEquals("login: Логин не должен содержать пробелы", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Создать пользователя. Пустой логин")
@@ -175,7 +176,7 @@ public class UserControllerTest {
 
         // Проверяем список ошибок
         JsonNode errors = responseJson.get("errors");
-        assertEquals("login: Поле \"Логин\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
+        assertTrue(errors.toString().contains("login: Логин не может быть пустым"),"Список ошибок должен содержать сообщение о пустом логине");
     }
 
     @DisplayName("Тест: Создать пользователя. Пустое имя")
@@ -341,7 +342,7 @@ public class UserControllerTest {
 
     @DisplayName("Тест: Обновить пользователя. Пустой логин")
     @Test
-    void testUpdateUser_InvalidLogin() throws Exception {
+    void testUpdateUser_EmptyLogin() throws Exception {
         String jsonUser = "{ \"id\": \"1\",\n" +
                 "    \"email\": \"correct@mail.ru\",\n" +
                 "    \"login\": \"\",\n" +
@@ -365,12 +366,12 @@ public class UserControllerTest {
 
         // Проверяем список ошибок
         JsonNode errors = responseJson.get("errors");
-        assertEquals("login: Поле \"Логин\" не может быть пустым", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
+        assertTrue(errors.toString().contains("Логин не может быть пустым"),"Список ошибок должен содержать сообщение о пустом логине");
     }
 
     @DisplayName("Тест: Обновить пользователя. Логин с пробелами")
     @Test
-    void testUpdateUser_EmptyLogin() throws Exception {
+    void testUpdateUser_InvalidLogin() throws Exception {
         String jsonUser = "{ \"id\": \"1\",\n" +
                 "    \"email\": \"correct@mail.ru\",\n" +
                 "    \"login\": \"Log In\",\n" +
@@ -394,7 +395,7 @@ public class UserControllerTest {
 
         // Проверяем список ошибок
         JsonNode errors = responseJson.get("errors");
-        assertEquals("login: Поле не должно содержать пробелов", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
+        assertEquals("login: Логин не должен содержать пробелы", errors.get(0).asText(), "Ошибка должна соответствовать ожидаемому сообщению");
     }
 
     @DisplayName("Тест: Обновить пользователя. Пустое имя")

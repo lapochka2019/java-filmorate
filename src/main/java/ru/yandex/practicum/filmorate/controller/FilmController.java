@@ -24,8 +24,6 @@ public class FilmController {
     //    добавление фильма
     @PostMapping()
     public ResponseEntity<?> createFilm(@Valid @RequestBody Film film) {
-        //Не стала делать проверку на пустую сущность
-        //так как предусмотрена валидация и хоть какие-то данные должны быть
         addId(film);
         log.info("Успешно создан новый фильм: {}", film);
         films.put(film.getId(), film);

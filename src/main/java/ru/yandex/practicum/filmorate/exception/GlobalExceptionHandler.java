@@ -18,7 +18,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleNotFoundException(NotFoundException ex) {
         Map<String, Object> errors = new HashMap<>();
         errors.put("timestamp", LocalDateTime.now());
-        errors.put("status", 404); // Статус 404 для "Not Found"
         errors.put("error", "Not Found");
         errors.put("message", ex.getMessage());
         errors.put("errors", List.of(ex.getMessage())); // Добавляем сообщение в список ошибок
@@ -30,7 +29,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> errors = new HashMap<>();
         errors.put("timestamp", LocalDateTime.now());
-        errors.put("status", 400);
         errors.put("error", "Bad Request");
         errors.put("message", "Validation failed");
         errors.put("errors", ex.getBindingResult().getFieldErrors().stream()

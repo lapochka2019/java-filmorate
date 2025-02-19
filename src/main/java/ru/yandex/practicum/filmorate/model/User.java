@@ -3,10 +3,10 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.annotation.NoWhitespace;
 
 import java.time.LocalDate;
 
@@ -21,8 +21,8 @@ public class User {
     @Email(message = "Это не похоже на email")
     private String email;
     //    логин пользователя
-    @NotBlank(message = "Поле \"Логин\" не может быть пустым")
-    @NoWhitespace
+    @NotBlank(message = "Логин не может быть пустым")
+    @Pattern(regexp = "^[^\\s]+$", message = "Логин не должен содержать пробелы")
     private String login;
     //    имя для отображения
     private String name;
