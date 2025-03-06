@@ -36,4 +36,15 @@ public class GlobalExceptionHandler {
                 .toList());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("timestamp", LocalDateTime.now());
+        errors.put("error", "Not Found");
+        errors.put("message", ex.getMessage());
+        errors.put("errors", List.of(ex.getMessage())); // Добавляем сообщение в список ошибок
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
+    }
 }
