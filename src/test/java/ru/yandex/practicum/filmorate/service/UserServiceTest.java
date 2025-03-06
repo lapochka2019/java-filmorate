@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,12 +87,12 @@ public class UserServiceTest {
         userService.addFriend(1, 2); // Добавляем дружбу
         userService.addFriend(1, 3); // Добавляем второго друга
 
-        Map<String, Set<Integer>> friends = userService.getFriends(1);
+        Set<Integer> friends = userService.getFriends(1);
 
         assertNotNull(friends);
-        assertEquals(2, friends.get("friends").size());
-        assertTrue(friends.get("friends").contains(2));
-        assertTrue(friends.get("friends").contains(3));
+        assertEquals(2, friends.size());
+        assertTrue(friends.contains(2));
+        assertTrue(friends.contains(3));
     }
 
     @DisplayName("Тест: Получить друзей. Пользователь не найден")
