@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -87,7 +86,7 @@ public class UserServiceTest {
         userService.addFriend(1, 2); // Добавляем дружбу
         userService.addFriend(1, 3); // Добавляем второго друга
 
-        Set<Integer> friends = userService.getFriends(1);
+        List<Integer> friends = userService.getFriends(1);
 
         assertNotNull(friends);
         assertEquals(2, friends.size());
