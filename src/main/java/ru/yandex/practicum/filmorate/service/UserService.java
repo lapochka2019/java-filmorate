@@ -7,7 +7,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,12 +54,14 @@ public class UserService {
     }
 
     //список друзей
-    public List<Integer> getFriends(int id) {
+    public Map<String, Set<Integer>> getFriends(int id) {
         log.info("Попытка получить друзей пользователя {}", id);
         try {
             User user = userStorage.getUser(id);
             log.info("Получение друзей удалось");
-            return user.getFriends().stream().toList();
+            Map<String, Set<Integer>> result = new HashMap<>();
+            result.put("friends", user.getFriends());
+            return result;
         } catch (NotFoundException e) {
             log.warn("Не удалось получить друзей пользователя: {}", e.getMessage());
             throw e;
