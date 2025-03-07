@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -75,7 +74,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public ResponseEntity<Set<Integer>> getFriends(@PathVariable int id) {
+    public ResponseEntity<List<User>> getFriends(@PathVariable int id) {
         log.info("Получение всех друзей пользователя с id = {}", id);
         return ResponseEntity.ok(service.getFriends(id));
     }
