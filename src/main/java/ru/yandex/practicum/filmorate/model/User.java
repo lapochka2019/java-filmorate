@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +18,7 @@ public class User {
     //    целочисленный идентификатор
     private int id;
     //    электронная почта
-    @NotBlank(message = "Поле \"email\" не может быть пустым")
+    @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Это не похоже на email")
     private String email;
     //    логин пользователя
@@ -29,4 +30,14 @@ public class User {
     //    дата рождения
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+    //список с id пользователей-друзей
+    private Set<Integer> friends;
+
+    public void addFriend(int id) {
+        friends.add(id);
+    }
+
+    public void deleteFriend(int id) {
+        friends.remove(id);
+    }
 }
