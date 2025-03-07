@@ -80,7 +80,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<List<Integer>> getFriends(@PathVariable int id, @PathVariable int otherId) {
+    public ResponseEntity<List<User>> getFriends(@PathVariable int id, @PathVariable int otherId) {
         log.info("Получение общих друзей пользователей с id {} и {}", id, otherId);
         return ResponseEntity.ok(service.getMutualFriends(id, otherId));
     }

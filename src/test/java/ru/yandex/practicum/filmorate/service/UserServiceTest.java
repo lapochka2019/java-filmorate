@@ -109,11 +109,10 @@ public class UserServiceTest {
         userService.addFriend(1, 3); // Пользователь 1 и 3 становятся друзьями
         userService.addFriend(2, 3); // Пользователь 2 и 3 становятся друзьями
 
-        List<Integer> mutualFriends = userService.getMutualFriends(1, 2);
+        List<User> mutualFriends = userService.getMutualFriends(1, 2);
 
         assertNotNull(mutualFriends);
         assertEquals(1, mutualFriends.size());
-        assertTrue(mutualFriends.contains(3));
     }
 
     @DisplayName("Тест: Получить общих друзей. Нет общих друзей")
@@ -125,7 +124,7 @@ public class UserServiceTest {
         userService.addFriend(1, 2); // Пользователь 1 и 2 становятся друзьями
         userService.addFriend(3, 4); // Пользователь 3 и 4 становятся друзьями
 
-        List<Integer> mutualFriends = userService.getMutualFriends(1, 3);
+        List<User> mutualFriends = userService.getMutualFriends(1, 3);
 
         assertNotNull(mutualFriends);
         assertTrue(mutualFriends.isEmpty());

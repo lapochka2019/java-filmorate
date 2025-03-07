@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,11 +56,9 @@ public class UserService {
         try {
             User user = userStorage.getUser(id);
             log.info("Получение друзей удалось");
-            List<User> result = new ArrayList<>();
-            for (int i : user.getFriends()) {
-                result.add(userStorage.getUser(i));
-            }
-            return result;
+            return user.getFriends().stream()
+                    .map(userStorage::getUser)
+                    .collect(Collectors.toList());
         } catch (NotFoundException e) {
             log.warn("Не удалось получить друзей пользователя: {}", e.getMessage());
             throw e;
@@ -69,14 +66,17 @@ public class UserService {
     }
 
     //список общих друзей
-    public List<Integer> getMutualFriends(int firstId, int secondId) {
+    public List<User> getMutualFriends(int firstId, int secondId) {
         log.info("Попытка получить общих друзей пользователей {} и {}", firstId, secondId);
         try {
             User firstUser = userStorage.getUser(firstId);
             User secondUser = userStorage.getUser(secondId);
             log.info("Получение общих друзей");
-            return firstUser.getFriends().stream()
+            List<Integer> preResult = firstUser.getFriends().stream()
                     .filter(secondUser.getFriends()::contains)
+                    .collect(Collectors.toList());
+            return preResult.stream()
+                    .map(userStorage::getUser)
                     .collect(Collectors.toList());
         } catch (NotFoundException e) {
             log.warn("Не удалось получить общих друзей: {}", e.getMessage());
