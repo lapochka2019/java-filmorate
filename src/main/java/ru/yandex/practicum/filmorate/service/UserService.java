@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,15 +73,28 @@ public class UserService {
             User firstUser = userStorage.getUser(firstId);
             User secondUser = userStorage.getUser(secondId);
             log.info("Получение общих друзей");
-            List<Integer> preResult = firstUser.getFriends().stream()
-                    .filter(secondUser.getFriends()::contains)
-                    .collect(Collectors.toList());
-            return preResult.stream()
-                    .map(userStorage::getUser)
+            return firstUser.getFriends().stream()
+                    .filter(secondUser.getFriends()::contains).map(userStorage::getUser)
                     .collect(Collectors.toList());
         } catch (NotFoundException e) {
             log.warn("Не удалось получить общих друзей: {}", e.getMessage());
             throw e;
         }
+    }
+
+    public void addUser(User user) {
+        userStorage.addUser(user);
+    }
+
+    public void updateUser(User user) {
+        userStorage.updateUser(user);
+    }
+
+    public User getUser(int id) {
+        return userStorage.getUser(id);
+    }
+
+    public ArrayList<User> getUsers() {
+        return userStorage.getUsers();
     }
 }

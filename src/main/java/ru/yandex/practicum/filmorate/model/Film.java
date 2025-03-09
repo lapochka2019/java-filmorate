@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validator.MinDate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -30,7 +31,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
     //список с id пользователей, поставивших лайк
-    private Set<Integer> like;
+    private Set<Integer> like = new HashSet<>();
 
     public void addLike(int userId) {
         like.add(userId);

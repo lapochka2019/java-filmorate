@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -31,7 +32,7 @@ public class User {
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
     //список с id пользователей-друзей
-    private Set<Integer> friends;
+    private Set<Integer> friends = new HashSet<>();
 
     public void addFriend(int id) {
         friends.add(id);

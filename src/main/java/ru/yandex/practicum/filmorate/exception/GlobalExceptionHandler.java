@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
         Map<String, Object> errors = new HashMap<>();
         errors.put("timestamp", LocalDateTime.now());
-        errors.put("error", "Not Found");
+        errors.put("error", "Internal server error");
         errors.put("message", ex.getMessage());
         errors.put("errors", List.of(ex.getMessage())); // Добавляем сообщение в список ошибок
 

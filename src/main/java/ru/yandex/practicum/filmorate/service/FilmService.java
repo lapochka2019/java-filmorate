@@ -8,8 +8,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -54,9 +54,22 @@ public class FilmService {
     //топ 10 фильмов (по кол-ву лайков)
     public List<Film> getTopFilms(int limit) {
         log.info("Получены лучшие {} фильмов", limit);
-        return filmStorage.getFilms().stream()
-                .sorted((film1, film2) -> Integer.compare(film2.getLike().size(), film1.getLike().size())) // Сортируем по убыванию количества лайков
-                .limit(limit) // Берем первые 10 фильмов
-                .collect(Collectors.toList()); // Преобразуем в список
+        return filmStorage.getTopFilms(limit);
+    }
+
+    public void addFilm(Film film) {
+        filmStorage.addFilm(film);
+    }
+
+    public void updateFilm(Film film) {
+        filmStorage.updateFilm(film);
+    }
+
+    public Film getFilm(int id) {
+        return filmStorage.getFilm(id);
+    }
+
+    public ArrayList<Film> getFilms() {
+        return filmStorage.getFilms();
     }
 }

@@ -9,8 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
@@ -20,20 +18,18 @@ import java.util.List;
 @Validated
 public class UserController {
 
-    UserStorage userStorage;
-    UserService service;
+    UserService userService;
 
     @Autowired
-    public UserController(InMemoryUserStorage userStorage, UserService service) {
-        this.userStorage = userStorage;
-        this.service = service;
+    public UserController(UserService service) {
+        this.userService = service;
     }
 
     //    добавление пользователя
     @PostMapping()
     public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
         log.info("Успешное создание нового пользователя: {}", user);
-        userStorage.addUser(user);
+        userService.addUser(user);
         return ResponseEntity.ok(user);
     }
 
@@ -41,7 +37,7 @@ public class UserController {
     @PutMapping()
     public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
         log.info("Успешное обновление пользователя: {}", user);
-        userStorage.updateUser(user);
+        userService.updateUser(user);
         return ResponseEntity.ok(user);
     }
 
@@ -49,39 +45,39 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUser(@PathVariable int id) {
         log.info("Получение пользователя по id");
-        return ResponseEntity.ok(userStorage.getUser(id));
+        return ResponseEntity.ok(userService.getUser(id));
     }
 
     //    получение всех пользователей
     @GetMapping()
     public ResponseEntity<List<User>> getUsers() {
         log.info("Получение всех пользователей");
-        return ResponseEntity.ok(userStorage.getUsers());
+        return ResponseEntity.ok(userService.getUsers());
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<?> addFriend(@PathVariable("id") int userId, @PathVariable int friendId) {
         log.info("Добавление в друзья");
-        service.addFriend(userId, friendId);
+        userService.addFriend(userId, friendId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<?> deleteFriend(@PathVariable("id") int userId, @PathVariable int friendId) {
         log.info("Удаление из друзей");
-        service.deleteFriend(userId, friendId);
+        userService.deleteFriend(userId, friendId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getFriends(@PathVariable int id) {
         log.info("Получение всех друзей пользователя с id = {}", id);
-        return ResponseEntity.ok(service.getFriends(id));
+        return ResponseEntity.ok(userService.getFriends(id));
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public ResponseEntity<List<User>> getFriends(@PathVariable int id, @PathVariable int otherId) {
         log.info("Получение общих друзей пользователей с id {} и {}", id, otherId);
-        return ResponseEntity.ok(service.getMutualFriends(id, otherId));
+        return ResponseEntity.ok(userService.getMutualFriends(id, otherId));
     }
 }

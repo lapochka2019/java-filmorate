@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -79,5 +80,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             film.setLike(new HashSet<>());
             log.info("likes Set фильма заменен на пустой HashSet");
         }
+    }
+
+    @Override
+    public List<Film> getTopFilms(int limit) {
+        return films.values().stream()
+                .sorted((film1, film2) -> Integer.compare(film2.getLike().size(), film1.getLike().size())) // Сортируем по убыванию количества лайков
+                .limit(limit) // Берем первые 10 фильмов
+                .collect(Collectors.toList()); // Преобразуем в список
     }
 }
