@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validator.MinDate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +19,7 @@ public class Film {
     //    целочисленный идентификатор
     private int id;
     //    название
-    @NotBlank(message = "Поле \"Имя\" не может быть пустым")
+    @NotBlank(message = "Имя не может быть пустым")
     private String name;
     //    описание
     @Size(max = 200, message = "Длина описания не должна превышать 200 символов")
@@ -28,5 +30,14 @@ public class Film {
     //    продолжительность фильма
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
+    //список с id пользователей, поставивших лайк
+    private Set<Integer> like = new HashSet<>();
 
+    public void addLike(int userId) {
+        like.add(userId);
+    }
+
+    public void deleteLike(int userId) {
+        like.remove(userId);
+    }
 }
