@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS film (
     description VARCHAR(200),
     release_date DATE NOT NULL,
     duration INT NOT NULL,
+    rating_id INT,
     FOREIGN KEY (rating_id) REFERENCES rating(id)
 );
 
