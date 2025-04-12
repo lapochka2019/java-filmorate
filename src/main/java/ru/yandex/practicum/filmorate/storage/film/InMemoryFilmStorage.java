@@ -76,8 +76,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public void putFilmLikes(Film film) {
-        if (film.getLike() == null) {
-            film.setLike(new HashSet<>());
+        if (film.getLikes() == null) {
+            film.setLikes(new HashSet<>());
             log.info("likes Set фильма заменен на пустой HashSet");
         }
     }
@@ -85,7 +85,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getTopFilms(int limit) {
         return films.values().stream()
-                .sorted((film1, film2) -> Integer.compare(film2.getLike().size(), film1.getLike().size())) // Сортируем по убыванию количества лайков
+                .sorted((film1, film2) -> Integer.compare(film2.getLikes().size(), film1.getLikes().size())) // Сортируем по убыванию количества лайков
                 .limit(limit) // Берем первые 10 фильмов
                 .collect(Collectors.toList()); // Преобразуем в список
     }

@@ -30,14 +30,31 @@ public class Film {
     //    продолжительность фильма
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
+    //рейтинг фильма (оценка)
+    @Positive(message = "Оценка фильма должна быть положительным числом")
+    private int rate;
+    //возрастной рейтинг - ссылается на таблицу
+    private int mpa;
     //список с id пользователей, поставивших лайк
-    private Set<Integer> like = new HashSet<>();
+    private Set<Integer> likes = new HashSet<>();
+    //список с жанрами фильма
+    private Set<Integer> genres = new HashSet<>();
 
     public void addLike(int userId) {
-        like.add(userId);
+        likes.add(userId);
+        rate++;
     }
 
-    public void deleteLike(int userId) {
-        like.remove(userId);
+    public void removeLike(int userId) {
+        likes.remove(userId);
+        rate--;
+    }
+
+    public void addGenre(int genreId) {
+        genres.add(genreId);
+    }
+
+    public void removeGenre(int genreId) {
+        genres.remove(genreId);
     }
 }

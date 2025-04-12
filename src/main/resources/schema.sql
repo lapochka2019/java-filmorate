@@ -1,20 +1,20 @@
 -- Удаление зависимых таблиц
---DROP TABLE IF EXISTS film_likes;
---DROP TABLE IF EXISTS film_genre;
---DROP TABLE IF EXISTS user_friends;
+DROP TABLE IF EXISTS film_likes;
+DROP TABLE IF EXISTS film_genre;
+DROP TABLE IF EXISTS user_friends;
 
 -- Удаление таблиц с внешними ключами
---DROP TABLE IF EXISTS film;
---DROP TABLE IF EXISTS consumer;
+DROP TABLE IF EXISTS film;
+DROP TABLE IF EXISTS consumer;
 
 -- Удаление независимых таблиц
---DROP TABLE IF EXISTS rating;
---DROP TABLE IF EXISTS genre;
---DROP TABLE IF EXISTS friendship_type;
+DROP TABLE IF EXISTS mpa_rating;
+DROP TABLE IF EXISTS genre;
+DROP TABLE IF EXISTS friendship_type;
 
 
--- Создание таблицы Rating
-CREATE TABLE IF NOT EXISTS rating (
+-- Создание таблицы mpa Rating
+CREATE TABLE IF NOT EXISTS mpa_rating (
     id INT PRIMARY KEY,
     name VARCHAR(20) NOT NULL
 );
@@ -47,8 +47,9 @@ CREATE TABLE IF NOT EXISTS film (
     description VARCHAR(200),
     release_date DATE NOT NULL,
     duration INT NOT NULL,
-    rating_id INT,
-    FOREIGN KEY (rating_id) REFERENCES rating(id)
+    mpa_rating_id INT,
+    rate INT DEFAULT 0,--likes count
+    FOREIGN KEY (mpa_rating_id) REFERENCES mpa_rating(id) --mpa rating from rating table
 );
 
 -- Создание таблицы Film_Likes
