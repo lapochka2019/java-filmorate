@@ -15,13 +15,11 @@ import java.util.List;
 @Slf4j
 @Service
 public class FilmService {
-    FilmStorage filmStorage;
     UserStorage userStorage;
     FilmRepository filmRepository;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage,FilmRepository filmRepository) {
-        this.filmStorage = filmStorage;
+    public FilmService(UserStorage userStorage,FilmRepository filmRepository) {
         this.userStorage = userStorage;
         this.filmRepository = filmRepository;
     }
@@ -31,8 +29,7 @@ public class FilmService {
         log.info("Пользователь {} пытается поставить лайк фильму {}", userId, filmId);
         try {
             userStorage.getUser(userId);//выбросит исключение
-            Film film = filmStorage.getFilm(filmId);
-            film.addLike(userId);
+            Film film = filmRepository.getFilm(filmId);
             log.info("Лайк поставлен успешно");
         } catch (NotFoundException e) {
             log.warn("Поставить лайк не удалось: {}", e.getMessage());
@@ -44,9 +41,7 @@ public class FilmService {
     public void deleteLike(int userId, int filmId) {
         log.info("Пользователь {} пытается удалить лайк у фильма {}", userId, filmId);
         try {
-            userStorage.getUser(userId);//выбросит исключение
-            Film film = filmStorage.getFilm(filmId);
-            film.removeLike(userId);
+            Film film = filmRepository.getFilm(filmId);
             log.info("Лайк удален успешно");
         } catch (NotFoundException e) {
             log.warn("Удалить лайк не удалось: {}", e.getMessage());
@@ -57,7 +52,7 @@ public class FilmService {
     //топ 10 фильмов (по кол-ву лайков)
     public List<Film> getTopFilms(int limit) {
         log.info("Получены лучшие {} фильмов", limit);
-        return filmStorage.getTopFilms(limit);
+        return filmRepository.getTopFilms(limit);
     }
 
     public void addFilm(Film film) {
@@ -65,14 +60,14 @@ public class FilmService {
     }
 
     public void updateFilm(Film film) {
-        filmStorage.updateFilm(film);
+        filmRepository.updateFilm(film);
     }
 
     public Film getFilm(int id) {
-        return filmStorage.getFilm(id);
+        return filmRepository.getFilm(id);
     }
 
-    public ArrayList<Film> getFilms() {
-        return filmStorage.getFilms();
+    public List<Film> getFilms() {
+        return filmRepository.getFilms();
     }
 }
