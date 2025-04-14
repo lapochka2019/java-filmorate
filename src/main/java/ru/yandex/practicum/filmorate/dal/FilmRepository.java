@@ -18,8 +18,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-import static java.sql.Types.NULL;
-
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -32,11 +30,8 @@ public class FilmRepository {
 
     //Создать
     public void addFilm(Film film) {
-        //Проверяем возрастной рейтинг
-        if (!checkMpaRating(film.getMpa().getId())) {
-            film.getMpa().setId(NULL);
-            log.error("Возрастное ограничение с id: {} не найдено", film.getMpa());
-        }
+        checkMpaRating(film.getMpa().getId());
+        genresRepository.checkGenre(film.getGenres());
 
         String sql = "INSERT INTO film (name, description, release_date, duration, rate, mpa_rating_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -88,10 +83,8 @@ public class FilmRepository {
     //Обновить
     public void updateFilm(Film film) {
         //Проверяем возрастной рейтинг
-        if (!checkMpaRating(film.getMpa().getId())) {
-            film.getMpa().setId(NULL);
-            log.error("Возрастное ограничение с id: {} не найдено", film.getMpa());
-        }
+        checkMpaRating(film.getMpa().getId());
+        genresRepository.checkGenre(film.getGenres());
 
         String sql = "UPDATE film SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=? " +
                 "WHERE id=?";
@@ -229,10 +222,13 @@ public class FilmRepository {
     }
 
     //Проверяем, есть ли указанный возрастной рейтинг в таблице
-    private boolean checkMpaRating(int ratingId) {
-        String sql = "SELECT id FROM mpa_rating";
-        List<Integer> mpaRatingList = jdbcTemplate.queryForList(sql, Integer.class);
-        return mpaRatingList.contains(ratingId);
+    private void checkMpaRating(int ratingId) {
+        String sql = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, ratingId);
+        if (count == null || count == 0) {
+            log.error("Пользователь с ID {} не найден", ratingId);
+            throw new NotFoundException("Пользователь с ID " + ratingId + " не найден");
+        }
     }
 
     public void updateRate(int filmId, int rate) {

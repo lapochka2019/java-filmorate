@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -99,31 +100,19 @@ public class GenresRepository {
         }
     }
 
-//    public List<FilmDto> getFilmsWithGenre() {
-//        try {
-//            String sql = "SELECT f.id, " +
-//                    "       f.name, " +
-//                    "       f.description, " +
-//                    "       f.release_date, " +
-//                    "       f.duration, " +
-//                    "       f.rate, " +
-//                    "       m.name AS mpa_name, " +
-//                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
-//                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
-//                    "FROM film f " +
-//                    "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
-//                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-//                    "INNER JOIN film_genre fg ON f.id = fg.film_id " + // Только фильмы с жанрами
-//                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
-//                    "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.name";
-//
-//            // Выполняем запрос и маппинг результатов
-//            return jdbcTemplate.query(sql, new FilmDtoMapper());
-//        } catch (EmptyResultDataAccessException ex) {
-//            log.warn("Нет фильмов с жанрами в БД");
-//            return Collections.emptyList(); // Возвращаем пустой список, если данных нет
-//        } catch (DataAccessException ex) {
-//            log.error("Ошибка при получении фильмов с жанрами: {}", ex.getMessage());
-//            throw new NotFoundException("Не удалось получить фильмы с жанрами");
-//        }
+    public void checkGenre(Set<Genre> genres) {
+        Set<Integer> genreIds = genres.stream()
+                .map(Genre::getId) // Получаем id каждого жанра
+                .collect(Collectors.toSet());
+        String placeholders = String.join(",", Collections.nCopies(genreIds.size(), "?"));
+        String sql = "SELECT COUNT(*) FROM genre WHERE id IN (" + placeholders + ")";
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, genres.toArray());
+        if (count == null || count < genres.size()) {
+            log.warn("Не все жанры найдены в базе данных");
+            throw new NotFoundException("Не все жанры найдены в базе данных");
+        }
+
+        log.info("Все жанры с ID {} найдены в базе данных", genres);
+    }
 }

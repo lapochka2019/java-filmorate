@@ -45,41 +45,4 @@ public class MpaRepository {
             throw new DataIntegrityViolationException("Не удалось получить МРА рейтинги");
         }
     }
-
-//    public List<FilmDto> getMpaRatings() {
-//        try {
-//            String sql = "SELECT f.id, " +
-//                    "       f.name, " +
-//                    "       f.description, " +
-//                    "       f.release_date, " +
-//                    "       f.duration, " +
-//                    "       f.rate, " +
-//                    "       m.name AS mpa_name, " +
-//                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
-//                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
-//                    "FROM film f " +
-//                    "INNER JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
-//                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-//                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
-//                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
-//                    "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.name";
-//
-//            log.info("Выполняется запрос на получение фильмов с MPA рейтингом");
-//            List<FilmDto> films = jdbcTemplate.query(sql, new FilmDtoMapper());
-//
-//            if (films.isEmpty()) {
-//                log.warn("Список фильмов с MPA рейтингом пуст");
-//            } else {
-//                log.info("Успешно получено {} фильмов с MPA рейтингом", films.size());
-//            }
-//
-//            return films;
-//        } catch (EmptyResultDataAccessException ex) {
-//            log.warn("Нет фильмов с MPA рейтингом в БД");
-//            return Collections.emptyList(); // Возвращаем пустой список, если данных нет
-//        } catch (DataAccessException ex) {
-//            log.error("Ошибка при получении фильмов с MPA рейтингом: {}", ex.getMessage());
-//            throw new NotFoundException("Не удалось получить фильмы с MPA рейтингом");
-//        }
-//    }
 }
