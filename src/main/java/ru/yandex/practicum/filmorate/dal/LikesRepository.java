@@ -44,14 +44,41 @@ public class LikesRepository {
     }
 
     public void addLike(int filmId, int userId) {
+        // Проверка существования фильма
+        if (!filmExists(filmId)) {
+            log.error("Фильм с id {} не найден", filmId);
+            throw new NotFoundException("Фильм с id " + filmId + " не найден");
+        }
+
+        // Проверка существования пользователя
+        if (!userExists(userId)) {
+            log.error("Пользователь с id {} не найден", userId);
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+
+        // Добавление лайка
         String insertSql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
         try {
             jdbcTemplate.update(insertSql, filmId, userId);
             log.info("Лайк пользователя с id: {} успешно добавлен к фильму {}", userId, filmId);
         } catch (DataAccessException ex) {
-            log.error("Произошла ошибка. Возможно не найден пользователь {}  или фильм {}", userId, filmId);
-            throw new NotFoundException("Произошла ошибка. Возможно не найден пользователь " + userId + " или фильм " + filmId);
+            log.error("Произошла ошибка при добавлении лайка. Возможно, дублирование лайка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Произошла ошибка при добавлении лайка. Возможно, дублирование лайка");
         }
+    }
+
+    // Метод для проверки существования фильма
+    private boolean filmExists(int filmId) {
+        String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+        return count != null && count > 0;
+    }
+
+    // Метод для проверки существования пользователя
+    private boolean userExists(int userId) {
+        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 
     public void removeLike(int filmId, int userId) {

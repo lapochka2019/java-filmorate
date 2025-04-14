@@ -70,7 +70,7 @@ public class FilmControllerTest {
     @DisplayName("Добавить лайк. Успешно")
     void testAddLike_Success() throws Exception {
         //Выполняем PUT-запрос и проверяем результат
-        mockMvc.perform(put("/films/{id}/like/{userId}", 1, 3)
+        mockMvc.perform(put("/films/{id}/like/{userId}", 1, 5)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -82,7 +82,7 @@ public class FilmControllerTest {
         mockMvc.perform(put("/films/{id}/like/{userId}", 999, 1)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()) // Ожидаем статус 404 NOT FOUND
-                .andExpect(jsonPath("$.message").value("Произошла ошибка. Возможно не найден пользователь 1 или фильм 999"));
+                .andExpect(jsonPath("$.message").value("Фильм с id 999 не найден"));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class FilmControllerTest {
         mockMvc.perform(put("/films/{id}/like/{userId}", 1, 999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()) // Ожидаем статус 404 NOT FOUND
-                .andExpect(jsonPath("$.message").value("Произошла ошибка. Возможно не найден пользователь 999 или фильм 1"));
+                .andExpect(jsonPath("$.message").value("Пользователь с id 999 не найден"));
     }
 
     @Test
