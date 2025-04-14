@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -96,7 +97,7 @@ public class UserControllerValidationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 BAD REQUEST
-                .andExpect(jsonPath("$.errors[1]").value("login: Логин не может быть пустым"));
+                .andExpect(jsonPath("$.errors", hasItem("login: Логин не может быть пустым")));
     }
 
     @Test
