@@ -131,7 +131,7 @@ public class FilmControllerValidationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 BAD REQUEST
-                .andExpect(jsonPath("$.errors[0]").value("rate: Оценка фильма должна быть положительным числом"));
+                .andExpect(jsonPath("$.errors[0]").value("rate: Оценка фильма не может быть отрицательной"));
     }
 
     @DisplayName("Обновить фильм. Успешно")
@@ -250,6 +250,6 @@ public class FilmControllerValidationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 BAD REQUEST
-                .andExpect(jsonPath("$.errors[0]").value("rate: Оценка фильма должна быть положительным числом"));
+                .andExpect(jsonPath("$.errors[0]").value("rate: Оценка фильма не может быть отрицательной"));
     }
 }
