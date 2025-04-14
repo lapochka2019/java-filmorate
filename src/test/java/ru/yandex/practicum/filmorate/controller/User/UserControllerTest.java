@@ -81,7 +81,7 @@ public class UserControllerTest {
     void testAddFriend_UserNotFound() throws Exception {
         mockMvc.perform(put("/users/{id}/friends/{friendId}", 999, 2)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
     }
 
     @Test
