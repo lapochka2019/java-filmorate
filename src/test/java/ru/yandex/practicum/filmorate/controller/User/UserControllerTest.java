@@ -109,12 +109,12 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Удаление из друзей - неуспешный исход (друг не найден)")
+    @DisplayName("Удаление из друзей. Друг не найден")
     void testDeleteFriend_FriendNotFound() throws Exception {
         mockMvc.perform(delete("/users/{id}/friends/{friendId}", 1, 999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()) // Ожидаем статус 404 NOT FOUND
-                .andExpect(jsonPath("$.message").value("Данные пользователи не являются друзьями"));
+                .andExpect(jsonPath("$.message").value("Пользователь с ID 999 не найден"));
     }
 
     @Test

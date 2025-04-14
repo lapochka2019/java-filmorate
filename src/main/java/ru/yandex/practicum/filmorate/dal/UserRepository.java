@@ -136,6 +136,16 @@ public class UserRepository {
 
     //Удалить из друзей
     public void deleteFriend(int firstId, int secondId) {
+        // Проверяем, существует ли пользователь в БД
+        if (!userExists(firstId)) {
+            log.error("Пользователь с ID {} не найден в БД", firstId);
+            throw new NotFoundException("Пользователь с ID " + firstId + " не найден");
+        }
+        // Проверяем, существует ли пользователь в БД
+        if (!userExists(secondId)) {
+            log.error("Пользователь с ID {} не найден в БД", secondId);
+            throw new NotFoundException("Пользователь с ID " + secondId + " не найден");
+        }
         //получаем тип дружбы
         Optional<Integer> friendshipOpt = friendshipRepository.getFriendshipType(firstId, secondId);
         //если дружба есть

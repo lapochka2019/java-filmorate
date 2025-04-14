@@ -28,7 +28,8 @@ DELETE FROM user_friends;
 INSERT INTO user_friends (user_id, friend_id, friendship_type_id) VALUES
 (1, 2, 2), -- User One и User Two (дружба подтверждена)
 (1, 3, 1), -- User One и User Three (дружба не подтверждена)
-(2, 4, 2); -- User Two и User Four (дружба подтверждена)
+(2, 4, 2), -- User Two и User Four (дружба подтверждена)
+(3, 4, 1); -- User Two и User Four (дружба подтверждена)
 
 INSERT INTO film (name, description, release_date, duration, mpa_rating_id) VALUES
 ('Фильм 1', 'Описание фильма 1', '2020-01-15', 120, 1), -- Рейтинг G

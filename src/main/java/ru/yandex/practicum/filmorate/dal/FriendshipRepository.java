@@ -85,7 +85,7 @@ public class FriendshipRepository {
         try {
             String sql = "SELECT friend_id AS friend FROM user_friends WHERE user_id = ? " +
                     "UNION " +
-                    "SELECT user_id AS friend FROM user_friends WHERE friend_id = ?";
+                    "SELECT user_id AS friend FROM user_friends WHERE friend_id = ? AND friendship_type_id=2";
 
             // Выполняем запрос и получаем список ID друзей
             List<Integer> friends = jdbcTemplate.queryForList(sql, Integer.class, userId, userId);
