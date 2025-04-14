@@ -28,8 +28,9 @@ public class FilmRepository {
     private final GenresRepository genresRepository;
     private final MpaRepository mpaRepository;
 
-    //Создать
     public void addFilm(Film film) {
+        log.info("Добавляем фильм ID {}", film.getId());
+        log.info(film.toString());
         checkMpaRating(film.getMpa().getId());
         genresRepository.checkGenre(film.getGenres());
 
@@ -52,26 +53,22 @@ public class FilmRepository {
             }, keyHolder);
             // Получаем последний вставленный id
             int filmId = keyHolder.getKey().intValue();
+
             film.setId(filmId);
             log.info("Выполнено добавление нового фильма в БД. ID фильма: {}", filmId);
 
-            // Добавляем жанры
             log.info("Вызван метод добавления жанров фильма в БД");
             film.setGenres(genresRepository.setGenresToFilm(filmId, film.getGenres()));
 
-            // Добавляем лайки
             log.info("Вызван метод добавления лайков фильма в БД");
             film.setLikes(likesRepository.setLikesToFilm(filmId, film.getLikes()));
 
-            // Обновляем поле rate (количество лайков)
             updateRate(filmId, film.getLikes().size());
 
             log.info("Вызван метод добавления Установки МРА");
-            // Подтягиваем данные для MPA
             film.setMpa(mpaRepository.getMpa(film.getMpa().getId()));
 
             log.info("Вызван метод Установки жанров");
-            // Подтягиваем данные для жанров
             film.setGenres(genresRepository.getGenresByFilm(filmId));
 
         } catch (DataIntegrityViolationException ex) {
@@ -80,8 +77,9 @@ public class FilmRepository {
         }
     }
 
-    //Обновить
     public void updateFilm(Film film) {
+        log.info("Добавляем фильм ID {}", film.getId());
+        log.info(film.toString());
         checkFilmExists(film.getId());
         //Проверяем возрастной рейтинг
         checkMpaRating(film.getMpa().getId());
@@ -112,28 +110,15 @@ public class FilmRepository {
             // Обновляем поле rate (количество лайков)
             updateRate(film.getId(), film.getLikes().size());
 
-
         } catch (DataIntegrityViolationException ex) {
             log.error("Во время обновления фильма : {} произошла непредвиденная ошибка", film.getId());
             throw new DataIntegrityViolationException("Не удалось обновить фильм");
         }
     }
 
-    public void checkFilmExists(int filmId) {
-        String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
-
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
-
-        if (count == null || count == 0) {
-            log.warn("Фильм с ID {} не найден в базе данных", filmId);
-            throw new NotFoundException("Фильм с ID " + filmId + " не существует");
-        }
-
-        log.info("Фильм с ID {} найден в базе данных", filmId);
-    }
-
     //Получить (1) + жанры + лайки
     public FilmDto getFilm(int filmId) {
+        log.info("Получаем данные о фильме ID {}", filmId);
         try {
             String sql = "SELECT f.id, " +
                     "       f.name, " +
@@ -152,16 +137,13 @@ public class FilmRepository {
                     "LEFT JOIN genre g ON fg.genre_id = g.id " +
                     "WHERE f.id = ? " +
                     "GROUP BY f.id";
-
-            log.info("Выполняется запрос к базе данных для получения фильма с ID: {}", filmId);
-
-            return jdbcTemplate.queryForObject(sql, new Object[]{filmId}, new FilmDtoMapper());
+            return jdbcTemplate.queryForObject(sql, new FilmDtoMapper(), filmId);
         } catch (EmptyResultDataAccessException ex) {
             log.error("Фильм с ID {} не найден", filmId);
-            throw new NotFoundException("Фильм с ID: " + filmId + " не существует");
+            throw new NotFoundException("Фильм с ID: " + filmId + " не существует. " + ex);
         } catch (DataAccessException ex) {
             log.error("Ошибка при выполнении запроса: {}", ex.getMessage());
-            throw new DataIntegrityViolationException("Не удалось получить фильм");
+            throw new DataIntegrityViolationException("Не удалось получить фильм. " + ex);
         }
     }
 
@@ -187,23 +169,11 @@ public class FilmRepository {
             return jdbcTemplate.query(sql, new FilmDtoMapper());
         } catch (EmptyResultDataAccessException ex) {
             log.error("Нет фильмов в БД");
-            throw new NotFoundException("Фильмы в БД не найдены");
+            throw new NotFoundException("Фильмы в БД не найдены. " + ex);
         } catch (DataAccessException ex) {
             log.error("Во время получения фильмов произошла непредвиденная ошибка: {}", ex.getMessage());
             throw new DataIntegrityViolationException("Не удалось получить фильмы");
         }
-    }
-
-    //Поставить лайк
-    public void addLike(int userId, int filmId) {
-        likesRepository.addLike(filmId, userId);
-        increaseRate(filmId);
-    }
-
-    //Удалить лайк
-    public void deleteLike(int userId, int filmId) {
-        likesRepository.removeLike(filmId, userId);
-        decreaseRate(filmId);
     }
 
     //Получить топ (10) фильмов
@@ -228,14 +198,38 @@ public class FilmRepository {
                     "ORDER BY f.rate DESC " +
                     "LIMIT ?";
 
-            return jdbcTemplate.query(sql, new Object[]{limit}, new FilmDtoMapper());
+            return jdbcTemplate.query(sql, new FilmDtoMapper(), limit);
         } catch (DataAccessException ex) {
             log.error("Во время получения фильмов произошла непредвиденная ошибка: {}", ex.getMessage());
             throw new DataIntegrityViolationException("Не удалось получить фильмы");
         }
     }
 
-    //Проверяем, есть ли указанный возрастной рейтинг в таблице
+    //Поставить лайк
+    public void addLike(int userId, int filmId) {
+        likesRepository.addLike(filmId, userId);
+        increaseRate(filmId);
+    }
+
+    //Удалить лайк
+    public void deleteLike(int userId, int filmId) {
+        likesRepository.removeLike(filmId, userId);
+        decreaseRate(filmId);
+    }
+
+    public void checkFilmExists(int filmId) {
+        String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+
+        if (count == null || count == 0) {
+            log.warn("Фильм с ID {} не найден в базе данных", filmId);
+            throw new NotFoundException("Фильм с ID " + filmId + " не существует");
+        }
+
+        log.info("Фильм с ID {} найден в базе данных", filmId);
+    }
+
     private void checkMpaRating(int ratingId) {
         String sql = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, ratingId);

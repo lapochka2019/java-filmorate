@@ -24,8 +24,8 @@ public class GenresRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    //получить жанры фильма
     public List<Genre> getGenresByFilm(int id) {
+        log.info("Получаем список жанров для фильма ID {}", id);
         String sql = "SELECT g.id AS genre_id, g.name AS genre_name " +
                 "FROM film f " +
                 "JOIN film_genre fg ON f.id = fg.film_id " +
@@ -43,8 +43,9 @@ public class GenresRepository {
         }
     }
 
-    // Добавление жанров к фильму
     public List<Genre> setGenresToFilm(int filmId, List<Genre> genres) {
+        List<Genre> result = new ArrayList<>();
+        log.info("Вносим в таблицу жанры фильма ID {}", filmId);
         // Запрос для добавления жанра к фильму
         String insertSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
 
@@ -52,13 +53,13 @@ public class GenresRepository {
             // Проверяем, существует ли жанр в списке
             try {
                 jdbcTemplate.update(insertSql, filmId, genre.getId());
+                result.add(genre);
                 log.info("Жанр с id: {} успешно добавлен фильму", genre.getId());
             } catch (DataIntegrityViolationException ex) {
-                genres.remove(genre.getId());
                 log.error("Жанра с ID " + genre.getId() + " не существует.");
             }
         }
-        return genres;
+        return result;
     }
 
     public void updateGenres(int filmId, List<Genre> genres) {
@@ -67,39 +68,15 @@ public class GenresRepository {
             String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
             jdbcTemplate.update(deleteSql, filmId);
             log.info("Жанры фильма с id:{} успешно удалены", filmId);
+            setGenresToFilm(filmId, genres);
         } catch (DataIntegrityViolationException ex) {
             log.error("Не удалось удалить жанры");
         }
         setGenresToFilm(filmId, genres);
     }
 
-    public Genre getGenre(int id) {
-        try {
-            String sql = "SELECT * FROM genre WHERE id=?";
-            return jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
-        } catch (EmptyResultDataAccessException ex) {
-            log.error("Не удалось получить жанр");
-            throw new NotFoundException("Жанр с ID " + id + " не найден");
-        } catch (DataAccessException ex) {
-            log.error("Во время получения жанра произошла непредвиденная ошибка: {}", ex.getMessage());
-            throw new DataIntegrityViolationException("Не удалось получить жанр");
-        }
-    }
-
-    public List<Genre> getGenres() {
-        try {
-            String sql = "SELECT id,name FROM genre";
-            return jdbcTemplate.query(sql, new GenreMapper());
-        } catch (EmptyResultDataAccessException ex) {
-            log.error("Не удалось получить жанры");
-            throw new NotFoundException("Не удалось получить жанры");
-        } catch (DataAccessException ex) {
-            log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage());
-            throw new DataIntegrityViolationException("Не удалось получить жанры");
-        }
-    }
-
     public void checkGenre(List<Genre> genres) {
+        log.info("Проверяем, что список жанров не пуст");
         // Проверяем, что список жанров не пуст
         if (genres == null || genres.isEmpty()) {
             log.warn("Список жанров пуст");
@@ -125,5 +102,33 @@ public class GenresRepository {
         }
 
         log.info("Все жанры с ID {} найдены в базе данных", genreIds);
+    }
+
+    public Genre getGenre(int id) {
+        log.info("Получаем Жанр ID {}", id);
+        try {
+            String sql = "SELECT * FROM genre WHERE id=?";
+            return jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
+        } catch (EmptyResultDataAccessException ex) {
+            log.error("Не удалось получить жанр");
+            throw new NotFoundException("Жанр с ID " + id + " не найден");
+        } catch (DataAccessException ex) {
+            log.error("Во время получения жанра произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить жанр");
+        }
+    }
+
+    public List<Genre> getGenres() {
+        log.info("Получаем список всех жанров");
+        try {
+            String sql = "SELECT id,name FROM genre";
+            return jdbcTemplate.query(sql, new GenreMapper());
+        } catch (EmptyResultDataAccessException ex) {
+            log.error("Не удалось получить жанры");
+            throw new NotFoundException("Не удалось получить жанры");
+        } catch (DataAccessException ex) {
+            log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить жанры");
+        }
     }
 }

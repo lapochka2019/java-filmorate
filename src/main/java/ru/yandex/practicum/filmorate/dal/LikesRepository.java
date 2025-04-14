@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Repository
@@ -21,6 +19,7 @@ public class LikesRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public List<Integer> setLikesToFilm(int filmId, List<Integer> likes) {
+        log.info("Вносим список лайков фильмаID {} в таблицу", filmId);
         // Запрос для добавления лайка
         String insertSql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
 
@@ -50,6 +49,7 @@ public class LikesRepository {
     }
 
     public void updateLikes(int filmId, List<Integer> likes) {
+        log.info("Обновляем список лайков фильмаID {} в таблицу", filmId);
         // Удаляем старые лайки
         String deleteSql = "DELETE FROM film_likes WHERE film_id = ?";
         jdbcTemplate.update(deleteSql, filmId);
@@ -59,6 +59,7 @@ public class LikesRepository {
     }
 
     public void addLike(int filmId, int userId) {
+        log.info("Пользватель ID {} ставит лайк фильму ID {} в таблицу", userId, filmId);
         // Проверка существования фильма
         if (!filmExists(filmId)) {
             log.error("Фильм с id {} не найден", filmId);
@@ -82,14 +83,12 @@ public class LikesRepository {
         }
     }
 
-    // Метод для проверки существования фильма
     private boolean filmExists(int filmId) {
         String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
         return count != null && count > 0;
     }
 
-    // Метод для проверки существования пользователя
     private boolean userExists(int userId) {
         String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
@@ -105,10 +104,5 @@ public class LikesRepository {
             log.error("Произошла ошибка. Возможно не найден пользователь {}  или фильм {}", userId, filmId);
             throw new NotFoundException("Произошла ошибка. Возможно не найден пользователь " + userId + " или фильм " + filmId);
         }
-    }
-
-    public Set<Integer> getLikesForFilm(int filmId) {
-        String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
-        return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, filmId));
     }
 }
