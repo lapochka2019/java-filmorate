@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -31,7 +32,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
     //рейтинг фильма (оценка)
-    @Positive(message = "Оценка фильма должна быть положительным числом")
+    @Min(value = 0, message = "Оценка фильма не может быть отрицательной")
     private int rate;
     //возрастной рейтинг - ссылается на таблицу
     private MpaRating mpa;
