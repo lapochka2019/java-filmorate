@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.util.List;
@@ -24,12 +24,12 @@ public class MpaController {
     MpaService mpaService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getGenre(@PathVariable int id) {
+    public ResponseEntity<?> getMpa(@PathVariable int id) {
         return ResponseEntity.ok(mpaService.getMpa(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<FilmDto>> getFilmWithGenre() {
-        return ResponseEntity.ok(mpaService.getFilmsWithMpa());
+    public ResponseEntity<List<MpaRating>> getMpaRatings() {
+        return ResponseEntity.ok(mpaService.getMpaRatings());
     }
 }

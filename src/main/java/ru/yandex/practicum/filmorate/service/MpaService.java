@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.MpaRepository;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.util.List;
@@ -21,8 +20,8 @@ public class MpaService {
         return mpaRepository.getMpa(id);
     }
 
-    public List<FilmDto> getFilmsWithMpa() {
-        log.info("Попытка получить фильмы с МРА рейтингом");
-        return mpaRepository.getFilmsWithMpa();
+    public List<MpaRating> getMpaRatings() {
+        log.info("Попытка получить список МРА рейтингов");
+        return mpaRepository.getMpaRatings();
     }
 }

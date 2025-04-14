@@ -54,8 +54,8 @@ public class MpaControllerTest {
         mockMvc.perform(get("/mpa")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Фильм 1"))
-                .andExpect(jsonPath("$[1].name").value("Фильм 2"));
+                .andExpect(jsonPath("$[0].name").value("G"))
+                .andExpect(jsonPath("$[1].name").value("PG"));
 
     }
 
