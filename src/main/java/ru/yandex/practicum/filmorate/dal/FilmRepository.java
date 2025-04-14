@@ -56,7 +56,7 @@ public class FilmRepository {
             }, keyHolder);
             // Получаем последний вставленный id
             int filmId = keyHolder.getKey().intValue();
-
+            film.setId(filmId);
             log.info("Выполнено добавление нового фильма в БД. ID фильма: {}", filmId);
 
             // Добавляем жанры

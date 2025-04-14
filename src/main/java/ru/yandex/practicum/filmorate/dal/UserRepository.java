@@ -45,6 +45,7 @@ public class UserRepository {
             }, keyHolder);
 
             int userId = keyHolder.getKey().intValue();
+            user.setId(userId);
             log.info("Выполнено добавление нового пользователя в БД. ID пользователя: {}", userId);
             // Добавляем друзей
             log.info("Вызван метод добавления друзей пользователя в БД");
