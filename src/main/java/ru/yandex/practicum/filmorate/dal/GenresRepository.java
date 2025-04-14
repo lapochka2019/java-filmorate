@@ -7,13 +7,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.mappers.FilmDtoMapper;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -67,32 +64,44 @@ public class GenresRepository {
         }
     }
 
-    public List<FilmDto> getFilmsWithGenre() {
+    public List<Genre> getGenres() {
         try {
-            String sql = "SELECT f.id, " +
-                    "       f.name, " +
-                    "       f.description, " +
-                    "       f.release_date, " +
-                    "       f.duration, " +
-                    "       f.rate, " +
-                    "       m.name AS mpa_name, " +
-                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
-                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
-                    "FROM film f " +
-                    "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
-                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                    "INNER JOIN film_genre fg ON f.id = fg.film_id " + // Только фильмы с жанрами
-                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
-                    "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.name";
-
-            // Выполняем запрос и маппинг результатов
-            return jdbcTemplate.query(sql, new FilmDtoMapper());
+            String sql = "SELECT id,name FROM genre";
+            return jdbcTemplate.query(sql, new GenreMapper());
         } catch (EmptyResultDataAccessException ex) {
-            log.warn("Нет фильмов с жанрами в БД");
-            return Collections.emptyList(); // Возвращаем пустой список, если данных нет
+            log.error("Не удалось получить жанры");
+            throw new NotFoundException("Не удалось получить жанры");
         } catch (DataAccessException ex) {
-            log.error("Ошибка при получении фильмов с жанрами: {}", ex.getMessage());
-            throw new NotFoundException("Не удалось получить фильмы с жанрами");
+            log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить жанры");
         }
     }
+
+//    public List<FilmDto> getFilmsWithGenre() {
+//        try {
+//            String sql = "SELECT f.id, " +
+//                    "       f.name, " +
+//                    "       f.description, " +
+//                    "       f.release_date, " +
+//                    "       f.duration, " +
+//                    "       f.rate, " +
+//                    "       m.name AS mpa_name, " +
+//                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
+//                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+//                    "FROM film f " +
+//                    "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
+//                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+//                    "INNER JOIN film_genre fg ON f.id = fg.film_id " + // Только фильмы с жанрами
+//                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
+//                    "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.name";
+//
+//            // Выполняем запрос и маппинг результатов
+//            return jdbcTemplate.query(sql, new FilmDtoMapper());
+//        } catch (EmptyResultDataAccessException ex) {
+//            log.warn("Нет фильмов с жанрами в БД");
+//            return Collections.emptyList(); // Возвращаем пустой список, если данных нет
+//        } catch (DataAccessException ex) {
+//            log.error("Ошибка при получении фильмов с жанрами: {}", ex.getMessage());
+//            throw new NotFoundException("Не удалось получить фильмы с жанрами");
+//        }
 }

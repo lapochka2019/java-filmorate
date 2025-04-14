@@ -54,8 +54,8 @@ public class GenreControllerTest {
         mockMvc.perform(get("/genres")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Фильм 1"))
-                .andExpect(jsonPath("$[1].name").value("Фильм 2"));
+                .andExpect(jsonPath("$[0].name").value("Комедия"))
+                .andExpect(jsonPath("$[1].name").value("Драма"));
     }
 
     @Test

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.GenresRepository;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class GenreService {
         return genresRepository.getGenre(id);
     }
 
-    public List<FilmDto> getFilmsWithGenre() {
-        return genresRepository.getFilmsWithGenre();
+    public List<Genre> getGenres() {
+        return genresRepository.getGenres();
     }
 }

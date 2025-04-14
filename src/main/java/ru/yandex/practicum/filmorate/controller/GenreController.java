@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.List;
@@ -28,8 +29,8 @@ public class GenreController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FilmDto>> getFilmWithGenre() {
-        return ResponseEntity.ok(genreService.getFilmsWithGenre());
+    public ResponseEntity<List<Genre>> getFilmWithGenre() {
+        return ResponseEntity.ok(genreService.getGenres());
     }
 
 }
