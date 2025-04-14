@@ -101,18 +101,30 @@ public class GenresRepository {
     }
 
     public void checkGenre(Set<Genre> genres) {
+        // Проверяем, что список жанров не пуст
+        if (genres == null || genres.isEmpty()) {
+            log.warn("Список жанров пуст");
+            return;
+        }
+
+        // Извлекаем id из объектов Genre
         Set<Integer> genreIds = genres.stream()
-                .map(Genre::getId) // Получаем id каждого жанра
+                .map(Genre::getId)
                 .collect(Collectors.toSet());
+
+        // Формируем строку плейсхолдеров
         String placeholders = String.join(",", Collections.nCopies(genreIds.size(), "?"));
         String sql = "SELECT COUNT(*) FROM genre WHERE id IN (" + placeholders + ")";
 
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, genres.toArray());
-        if (count == null || count < genres.size()) {
-            log.warn("Не все жанры найдены в базе данных");
+        // Выполняем запрос
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, genreIds.toArray());
+
+        // Проверяем количество найденных жанров
+        if (count == null || count < genreIds.size()) {
+            log.warn("Не все жанры с ID {} найдены в базе данных", genreIds);
             throw new NotFoundException("Не все жанры найдены в базе данных");
         }
 
-        log.info("Все жанры с ID {} найдены в базе данных", genres);
+        log.info("Все жанры с ID {} найдены в базе данных", genreIds);
     }
 }
