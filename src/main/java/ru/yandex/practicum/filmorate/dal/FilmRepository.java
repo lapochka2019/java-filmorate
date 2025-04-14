@@ -29,8 +29,6 @@ public class FilmRepository {
     private final MpaRepository mpaRepository;
 
     public void addFilm(Film film) {
-        log.info("Добавляем фильм ID {}", film.getId());
-        log.info(film.toString());
         checkMpaRating(film.getMpa().getId());
         genresRepository.checkGenre(film.getGenres());
 
@@ -71,6 +69,9 @@ public class FilmRepository {
             log.info("Вызван метод Установки жанров");
             film.setGenres(genresRepository.getGenresByFilm(filmId));
 
+            log.info("Добавляем фильм ID {}", film.getId());
+            log.info(film.toString());
+
         } catch (DataIntegrityViolationException ex) {
             log.error("Во время добавления фильма в БД произошла непредвиденная ошибка");
             throw new DataIntegrityViolationException("Не удалось добавить фильм в базу данных.");
@@ -78,7 +79,7 @@ public class FilmRepository {
     }
 
     public void updateFilm(Film film) {
-        log.info("Добавляем фильм ID {}", film.getId());
+        log.info("Обновляем фильм ID {}", film.getId());
         log.info(film.toString());
         checkFilmExists(film.getId());
         //Проверяем возрастной рейтинг
