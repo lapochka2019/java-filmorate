@@ -11,6 +11,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,18 +25,20 @@ public class GenresRepository {
 
     //получить жанры фильма
     public Set<Genre> getGenresByFilm(int id) {
+        String sql = "SELECT g.id AS genre_id, g.name AS genre_name " +
+                "FROM film f " +
+                "JOIN film_genre fg ON f.id = fg.film_id " +
+                "JOIN genre g ON fg.genre_id = g.id " +
+                "WHERE f.id = ?";
+
         try {
-            String sql = "SELECT g.id AS genre_id, g.name AS genre_name" +
-                    "FROM film f" +
-                    "JOIN film_genre fg ON f.id = fg.film_id" +
-                    "JOIN genre g ON fg.genre_id = g.id" +
-                    "WHERE f.id = ?";
-            return (Set<Genre>) jdbcTemplate.query(sql, new GenreMapper(), id);
+            List<Genre> genres = jdbcTemplate.query(sql, new GenreMapper(), id);
+            return new HashSet<>(genres); // Преобразуем список в множество
         } catch (EmptyResultDataAccessException ex) {
-            log.error("Не удалось получить жанры");
-            throw new NotFoundException("Не удалось получить жанры");
+            log.warn("Жанры для фильма с ID {} не найдены", id);
+            return Collections.emptySet(); // Возвращаем пустое множество
         } catch (DataAccessException ex) {
-            log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage());
+            log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage(), ex);
             throw new DataIntegrityViolationException("Не удалось получить жанры");
         }
     }

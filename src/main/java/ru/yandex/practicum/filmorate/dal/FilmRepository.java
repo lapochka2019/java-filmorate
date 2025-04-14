@@ -70,8 +70,12 @@ public class FilmRepository {
 
             // Обновляем поле rate (количество лайков)
             updateRate(filmId, film.getLikes().size());
+
+            log.info("Вызван метод добавления Установки МРА");
             // Подтягиваем данные для MPA
             film.setMpa(mpaRepository.getMpa(film.getMpa().getId()));
+
+            log.info("Вызван метод Установки жанров");
             // Подтягиваем данные для жанров
             film.setGenres(genresRepository.getGenresByFilm(filmId));
 
