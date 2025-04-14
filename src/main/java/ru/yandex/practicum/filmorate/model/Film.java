@@ -34,11 +34,11 @@ public class Film {
     @Positive(message = "Оценка фильма должна быть положительным числом")
     private int rate;
     //возрастной рейтинг - ссылается на таблицу
-    private int mpa;
+    private MpaRating mpa;
     //список с id пользователей, поставивших лайк
     private Set<Integer> likes = new HashSet<>();
     //список с жанрами фильма
-    private Set<Integer> genres = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
 
     public void addLike(int userId) {
         likes.add(userId);
@@ -50,11 +50,11 @@ public class Film {
         rate--;
     }
 
-    public void addGenre(int genreId) {
+    public void addGenre(Genre genreId) {
         genres.add(genreId);
     }
 
-    public void removeGenre(int genreId) {
+    public void removeGenre(Genre genreId) {
         genres.remove(genreId);
     }
 }

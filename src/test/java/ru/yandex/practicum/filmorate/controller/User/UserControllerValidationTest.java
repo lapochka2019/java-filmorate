@@ -153,6 +153,22 @@ public class UserControllerValidationTest {
     }
 
     @Test
+    @DisplayName("Обновление пользователя. Пользователь не найден")
+    void testUpdateUser_NotFound() throws Exception {
+        User user = new User();
+        user.setId(10);
+        user.setEmail("updated@example.com");
+        user.setLogin("updated_login");
+        user.setName("Updated Name");
+        user.setBirthday(LocalDate.of(1995, 1, 1));
+
+        mockMvc.perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("Обновление пользователя. Пустой email")
     void testUpdateUser_InvalidEmail() throws Exception {
         User user = new User();

@@ -58,6 +58,13 @@ public class UserRepository {
 
     //Редактировать
     public void updateUser(User user) {
+        // Проверяем, существует ли пользователь в БД
+        if (!userExists(user.getId())) {
+            log.error("Пользователь с ID {} не найден в БД", user.getId());
+            throw new NotFoundException("Пользователь с ID " + user.getId() + " не найден");
+        }
+
+        // SQL-запрос для обновления данных пользователя
         String sql = "UPDATE consumer SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
         try {
             jdbcTemplate.update(sql,
@@ -76,6 +83,13 @@ public class UserRepository {
             log.error("Во время обновления данных пользователя с ID {} произошла ошибка", user.getId());
             throw new DataIntegrityViolationException("Не удалось обновить данные пользователя.");
         }
+    }
+
+    // Метод для проверки существования пользователя в БД
+    private boolean userExists(int userId) {
+        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 
     //Получить (1)

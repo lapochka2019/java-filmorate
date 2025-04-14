@@ -14,4 +14,8 @@ public class MpaRating {
     //    название
     @NotBlank(message = "Имя не может быть пустым")
     private String name;
+
+    public MpaRating(int id) {
+        this.id = id;
+    }
 }

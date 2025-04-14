@@ -11,6 +11,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,9 +47,9 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(120);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
         film.setLikes(new HashSet<>(Arrays.asList(1, 2, 11)));
-        film.setGenres(new HashSet<>(Arrays.asList(1, 2, 3)));
+        film.setGenres(new HashSet<>(Arrays.asList(new Genre(1), new Genre(2), new Genre(3))));
 
         // Act & Assert: Выполняем POST-запрос и проверяем результат
         mockMvc.perform(post("/films")
@@ -69,7 +71,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(120);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +89,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(120);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -105,7 +107,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27)); // Дата раньше минимальной
         film.setDuration(120);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +125,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(120);
         film.setRate(-5); // Некорректная оценка (отрицательная)
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,9 +144,9 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(150);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
         film.setLikes(new HashSet<>(Arrays.asList(1, 2)));
-        film.setGenres(new HashSet<>(Arrays.asList(1, 2)));
+        film.setGenres(new HashSet<>(Arrays.asList(new Genre(1), new Genre(2))));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +168,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(150);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -185,7 +187,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(150);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -204,7 +206,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27)); // Дата раньше минимальной
         film.setDuration(150);
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -223,7 +225,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(-10); // Некорректная продолжительность (отрицательная)
         film.setRate(5);
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -242,7 +244,7 @@ public class FilmControllerValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(150);
         film.setRate(-5); // Некорректная оценка (отрицательная)
-        film.setMpa(1);
+        film.setMpa(new MpaRating(1));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)

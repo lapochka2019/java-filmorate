@@ -32,8 +32,8 @@ public class FilmRepository {
     //Создать
     public void addFilm(Film film) {
         //Проверяем возрастной рейтинг
-        if (!checkMpaRating(film.getMpa())) {
-            film.setMpa(NULL);
+        if (!checkMpaRating(film.getMpa().getId())) {
+            film.getMpa().setId(NULL);
             log.error("Возрастное ограничение с id: {} не найдено", film.getMpa());
         }
 
@@ -51,7 +51,7 @@ public class FilmRepository {
                 ps.setDate(3, java.sql.Date.valueOf(film.getReleaseDate()));
                 ps.setInt(4, film.getDuration());
                 ps.setInt(5, film.getRate());
-                ps.setInt(6, film.getMpa()); // Предполагается, что getMpa() возвращает ID рейтинга
+                ps.setInt(6, film.getMpa().getId()); // Предполагается, что getMpa() возвращает ID рейтинга
                 return ps;
             }, keyHolder);
             // Получаем последний вставленный id
@@ -80,8 +80,8 @@ public class FilmRepository {
     //Обновить
     public void updateFilm(Film film) {
         //Проверяем возрастной рейтинг
-        if (!checkMpaRating(film.getMpa())) {
-            film.setMpa(NULL);
+        if (!checkMpaRating(film.getMpa().getId())) {
+            film.getMpa().setId(NULL);
             log.error("Возрастное ограничение с id: {} не найдено", film.getMpa());
         }
 
@@ -95,7 +95,7 @@ public class FilmRepository {
                     java.sql.Date.valueOf(film.getReleaseDate()),
                     film.getDuration(),
                     film.getRate(),
-                    film.getMpa(),
+                    film.getMpa().getId(),
                     film.getId());
             log.info("Выполнено обновление фильма: {}", film.getId());
 

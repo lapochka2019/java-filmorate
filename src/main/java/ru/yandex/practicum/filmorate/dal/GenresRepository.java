@@ -26,24 +26,24 @@ public class GenresRepository {
     private final JdbcTemplate jdbcTemplate;
 
     // Добавление жанров к фильму
-    public Set<Integer> setGenresToFilm(int filmId, Set<Integer> genres) {
+    public Set<Genre> setGenresToFilm(int filmId, Set<Genre> genres) {
         // Запрос для добавления жанра к фильму
         String insertSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
 
-        for (Integer genreId : genres) {
+        for (Genre genre : genres) {
             // Проверяем, существует ли жанр в списке
             try {
-                jdbcTemplate.update(insertSql, filmId, genreId);
-                log.info("Жанр с id: {} успешно добавлен фильму", genreId);
+                jdbcTemplate.update(insertSql, filmId, genre.getId());
+                log.info("Жанр с id: {} успешно добавлен фильму", genre.getId());
             } catch (DataIntegrityViolationException ex) {
-                genres.remove(genreId);
-                log.error("Жанра с ID " + genreId + " не существует.");
+                genres.remove(genre.getId());
+                log.error("Жанра с ID " + genre.getId() + " не существует.");
             }
         }
         return genres;
     }
 
-    public void updateGenres(int filmId, Set<Integer> genres) {
+    public void updateGenres(int filmId, Set<Genre> genres) {
         // Удаляем старые жанры
         try {
             String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
@@ -53,16 +53,6 @@ public class GenresRepository {
             log.error("Не удалось удалить жанры");
         }
         setGenresToFilm(filmId, genres);
-    }
-
-    public Set<Integer> getGenresForFilm(int filmId) {
-        try {
-            String sql = "SELECT genre_id FROM film_genre WHERE film_id = ?";
-            return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, filmId));
-        } catch (DataIntegrityViolationException ex) {
-            log.error("Не удалось получить список жанров фильма");
-            throw new DataIntegrityViolationException("Не удалось получить список жанров фильма");
-        }
     }
 
     public Genre getGenre(int id) {

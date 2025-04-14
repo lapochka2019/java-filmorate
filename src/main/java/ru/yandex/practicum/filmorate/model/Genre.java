@@ -14,4 +14,8 @@ public class Genre {
     //    название
     @NotBlank(message = "Имя не может быть пустым")
     private String name;
+
+    public Genre(int id) {
+        this.id = id;
+    }
 }

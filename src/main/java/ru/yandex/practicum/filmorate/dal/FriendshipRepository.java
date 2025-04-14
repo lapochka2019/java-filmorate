@@ -32,13 +32,32 @@ public class FriendshipRepository {
     }
 
     public void addFriend(int userId, int friendId) {
+        // Проверяем существование пользователя и друга
+        if (!userExists(userId)) {
+            log.error("Пользователь с ID {} не найден", userId);
+            throw new NotFoundException("Пользователь с ID " + userId + " не найден");
+        }
+        if (!userExists(friendId)) {
+            log.error("Пользователь с ID {} не найден", friendId);
+            throw new NotFoundException("Пользователь с ID " + friendId + " не найден");
+        }
+
+        // SQL-запрос для добавления дружбы
         String sql = "INSERT INTO user_friends (user_id, friend_id, friendship_type_id) VALUES (?, ?, ?)";
         try {
             jdbcTemplate.update(sql, userId, friendId, 1);
             log.info("Запрос дружбы пользователя {} пользователю {} отправлен успешно", userId, friendId);
         } catch (DataIntegrityViolationException ex) {
-            log.error("Не удалось отправить запрос дружбы пользователя {} пользователю {}", userId, friendId);
+            log.error("Не удалось отправить запрос дружбы пользователя {} пользователю {}: {}", userId, friendId, ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось отправить запрос дружбы");
         }
+    }
+
+    // Метод для проверки существования пользователя в БД
+    private boolean userExists(int userId) {
+        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 
     public void removeFriend(int userId, int friendId) {
