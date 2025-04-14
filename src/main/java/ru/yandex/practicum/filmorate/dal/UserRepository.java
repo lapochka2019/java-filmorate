@@ -60,10 +60,7 @@ public class UserRepository {
     //Редактировать
     public void updateUser(User user) {
         // Проверяем, существует ли пользователь в БД
-        if (!userExists(user.getId())) {
-            log.error("Пользователь с ID {} не найден в БД", user.getId());
-            throw new NotFoundException("Пользователь с ID " + user.getId() + " не найден");
-        }
+        checkUserExists(user.getId());
 
         // SQL-запрос для обновления данных пользователя
         String sql = "UPDATE consumer SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
@@ -87,10 +84,13 @@ public class UserRepository {
     }
 
     // Метод для проверки существования пользователя в БД
-    private boolean userExists(int userId) {
+    public void checkUserExists(int userId) {
         String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
-        return count != null && count > 0;
+        if (count == null || count == 0) {
+            log.error("Пользователь с ID {} не найден", userId);
+            throw new NotFoundException("Пользователь с ID " + userId + " не найден");
+        }
     }
 
     //Получить (1)
@@ -124,6 +124,10 @@ public class UserRepository {
 
     //Отправить запрос в друзья
     public void addFriend(int firstId, int secondId) {
+        // Проверяем, существует ли пользователь в БД
+        checkUserExists(firstId);
+        // Проверяем, существует ли пользователь в БД
+        checkUserExists(secondId);
         //проверяем, есть ли уже запрос в друзья наоборот (2 к 1)
         Optional<Integer> friendship = friendshipRepository.getFriendshipType(secondId, firstId);
         //если есть, то подтверждаем дружбу
@@ -137,15 +141,9 @@ public class UserRepository {
     //Удалить из друзей
     public void deleteFriend(int firstId, int secondId) {
         // Проверяем, существует ли пользователь в БД
-        if (!userExists(firstId)) {
-            log.error("Пользователь с ID {} не найден в БД", firstId);
-            throw new NotFoundException("Пользователь с ID " + firstId + " не найден");
-        }
+        checkUserExists(firstId);
         // Проверяем, существует ли пользователь в БД
-        if (!userExists(secondId)) {
-            log.error("Пользователь с ID {} не найден в БД", secondId);
-            throw new NotFoundException("Пользователь с ID " + secondId + " не найден");
-        }
+        checkUserExists(secondId);
         //получаем тип дружбы
         Optional<Integer> friendshipOpt = friendshipRepository.getFriendshipType(firstId, secondId);
         //если дружба есть
@@ -163,12 +161,13 @@ public class UserRepository {
                 friendshipRepository.addFriend(secondId, firstId);
             }
         } else {
-            throw new NotFoundException("Данные пользователи не являются друзьями");
+            //throw new NotFoundException("Данные пользователи не являются друзьями");
         }
     }
 
     //Получить друзей
     public List<UserDto> getFriends(int id) {
+        checkUserExists(id);
         List<UserDto> friendsList = new ArrayList<>();
         Set<Integer> friends = friendshipRepository.getFriendsForUser(id);
         for (Integer userId : friends) {
@@ -179,6 +178,10 @@ public class UserRepository {
 
     //Получить общих друзей
     public List<UserDto> getMutualFriends(int firstId, int secondId) {
+        // Проверяем, существует ли пользователь в БД
+        checkUserExists(firstId);
+        // Проверяем, существует ли пользователь в БД
+        checkUserExists(secondId);
         List<UserDto> friendsList = new ArrayList<>();
         Set<Integer> friends = friendshipRepository.getCommonFriends(firstId, secondId);
         for (Integer userId : friends) {
