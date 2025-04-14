@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validator.MinDate;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -37,9 +37,9 @@ public class Film {
     //возрастной рейтинг - ссылается на таблицу
     private MpaRating mpa;
     //список с id пользователей, поставивших лайк
-    private Set<Integer> likes = new HashSet<>();
+    private List<Integer> likes = new ArrayList<>();
     //список с жанрами фильма
-    private Set<Genre> genres = new HashSet<>();
+    private List<Genre> genres = new ArrayList<>();
 
     public void addLike(int userId) {
         likes.add(userId);

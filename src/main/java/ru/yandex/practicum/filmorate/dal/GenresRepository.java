@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,7 +25,7 @@ public class GenresRepository {
     private final JdbcTemplate jdbcTemplate;
 
     //получить жанры фильма
-    public Set<Genre> getGenresByFilm(int id) {
+    public List<Genre> getGenresByFilm(int id) {
         String sql = "SELECT g.id AS genre_id, g.name AS genre_name " +
                 "FROM film f " +
                 "JOIN film_genre fg ON f.id = fg.film_id " +
@@ -33,11 +33,10 @@ public class GenresRepository {
                 "WHERE f.id = ?";
 
         try {
-            List<Genre> genres = jdbcTemplate.query(sql, new GenreMapper(), id);
-            return new HashSet<>(genres); // Преобразуем список в множество
+            return jdbcTemplate.query(sql, new GenreMapper(), id); // Преобразуем список в множество
         } catch (EmptyResultDataAccessException ex) {
             log.warn("Жанры для фильма с ID {} не найдены", id);
-            return Collections.emptySet(); // Возвращаем пустое множество
+            return new ArrayList<>(); // Возвращаем пустое множество
         } catch (DataAccessException ex) {
             log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage(), ex);
             throw new DataIntegrityViolationException("Не удалось получить жанры");
@@ -45,7 +44,7 @@ public class GenresRepository {
     }
 
     // Добавление жанров к фильму
-    public Set<Genre> setGenresToFilm(int filmId, Set<Genre> genres) {
+    public List<Genre> setGenresToFilm(int filmId, List<Genre> genres) {
         // Запрос для добавления жанра к фильму
         String insertSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
 
@@ -62,7 +61,7 @@ public class GenresRepository {
         return genres;
     }
 
-    public void updateGenres(int filmId, Set<Genre> genres) {
+    public void updateGenres(int filmId, List<Genre> genres) {
         // Удаляем старые жанры
         try {
             String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
@@ -100,7 +99,7 @@ public class GenresRepository {
         }
     }
 
-    public void checkGenre(Set<Genre> genres) {
+    public void checkGenre(List<Genre> genres) {
         // Проверяем, что список жанров не пуст
         if (genres == null || genres.isEmpty()) {
             log.warn("Список жанров пуст");

@@ -16,7 +16,6 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -48,8 +47,8 @@ public class FilmControllerValidationTest {
         film.setDuration(120);
         film.setRate(5);
         film.setMpa(new MpaRating(1));
-        film.setLikes(new HashSet<>(Arrays.asList(1, 2, 11)));
-        film.setGenres(new HashSet<>(Arrays.asList(new Genre(1), new Genre(2), new Genre(3))));
+        film.setLikes(Arrays.asList(1, 2, 11));
+        film.setGenres(Arrays.asList(new Genre(1), new Genre(2), new Genre(3)));
 
         // Act & Assert: Выполняем POST-запрос и проверяем результат
         mockMvc.perform(post("/films")
@@ -145,8 +144,8 @@ public class FilmControllerValidationTest {
         film.setDuration(150);
         film.setRate(5);
         film.setMpa(new MpaRating(1));
-        film.setLikes(new HashSet<>(Arrays.asList(1, 2)));
-        film.setGenres(new HashSet<>(Arrays.asList(new Genre(1), new Genre(2))));
+        film.setLikes(Arrays.asList(1, 2));
+        film.setGenres(Arrays.asList(new Genre(1), new Genre(2)));
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)

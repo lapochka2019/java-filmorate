@@ -8,7 +8,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -18,23 +20,36 @@ public class LikesRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public Set<Integer> setLikesToFilm(int filmId, Set<Integer> likes) {
-        // Запрос для добавления жанра к фильму
+    public List<Integer> setLikesToFilm(int filmId, List<Integer> likes) {
+        // Запрос для добавления лайка
         String insertSql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+
+        // Список для хранения успешно добавленных лайков
+        List<Integer> successfulLikes = new ArrayList<>();
 
         for (Integer userId : likes) {
             try {
+                // Проверяем, существует ли пользователь
+                if (!userExists(userId)) {
+                    log.error("Пользователя с id: {} нет в БД", userId);
+                    continue; // Пропускаем этого пользователя
+                }
+
+                // Добавляем лайк
                 jdbcTemplate.update(insertSql, filmId, userId);
                 log.info("Лайк пользователя с id: {} успешно добавлен к фильму {}", userId, filmId);
-            } catch (DataIntegrityViolationException ex) {
-                log.error("Пользователя с id: {} нет в БД", userId);
-                likes.remove(userId);
+
+                // Добавляем userId в список успешных лайков
+                successfulLikes.add(userId);
+            } catch (DataAccessException ex) {
+                log.error("Ошибка при добавлении лайка пользователя с id: {} к фильму {}: {}", userId, filmId, ex.getMessage());
             }
         }
-        return likes;
+
+        return successfulLikes;
     }
 
-    public void updateLikes(int filmId, Set<Integer> likes) {
+    public void updateLikes(int filmId, List<Integer> likes) {
         // Удаляем старые лайки
         String deleteSql = "DELETE FROM film_likes WHERE film_id = ?";
         jdbcTemplate.update(deleteSql, filmId);

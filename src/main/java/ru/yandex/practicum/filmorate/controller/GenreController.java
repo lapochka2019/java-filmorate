@@ -28,7 +28,7 @@ public class GenreController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Genre>> getFilmWithGenre() {
+    public ResponseEntity<List<Genre>> getGenres() {
         return ResponseEntity.ok(genreService.getGenres());
     }
 

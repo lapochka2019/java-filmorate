@@ -82,6 +82,7 @@ public class FilmRepository {
 
     //Обновить
     public void updateFilm(Film film) {
+        checkFilmExists(film.getId());
         //Проверяем возрастной рейтинг
         checkMpaRating(film.getMpa().getId());
         genresRepository.checkGenre(film.getGenres());
@@ -116,6 +117,19 @@ public class FilmRepository {
             log.error("Во время обновления фильма : {} произошла непредвиденная ошибка", film.getId());
             throw new DataIntegrityViolationException("Не удалось обновить фильм");
         }
+    }
+
+    public void checkFilmExists(int filmId) {
+        String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+
+        if (count == null || count == 0) {
+            log.warn("Фильм с ID {} не найден в базе данных", filmId);
+            throw new NotFoundException("Фильм с ID " + filmId + " не существует");
+        }
+
+        log.info("Фильм с ID {} найден в базе данных", filmId);
     }
 
     //Получить (1) + жанры + лайки

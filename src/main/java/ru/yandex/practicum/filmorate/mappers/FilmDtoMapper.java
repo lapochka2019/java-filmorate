@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,34 +37,34 @@ public class FilmDtoMapper implements RowMapper<FilmDto> {
         }
 
 // Поле likes
+        // Поле likes
         String likesString = rs.getString("likes");
         if (likesString != null && !likesString.isEmpty()) {
-            Set<Integer> likes = Arrays.stream(likesString.split(","))
+            List<Integer> likes = Arrays.stream(likesString.split(","))
                     .map(String::trim)
-                    .filter(s -> !s.isEmpty()) // Фильтруем пустые строки
+                    .filter(s -> s != null && !s.trim().isEmpty()) // Фильтруем пустые строки
                     .map(Integer::parseInt)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList()); // Собираем в список
             dto.setLikes(likes);
         } else {
-            dto.setLikes(Collections.emptySet());
+            dto.setLikes(Collections.emptyList()); // Возвращаем пустой список
         }
 
 // Поле genres
         String genresString = rs.getString("genres");
         if (genresString != null && !genresString.isEmpty()) {
-            Set<Genre> genres = Arrays.stream(genresString.split(","))
+            List<Genre> genres = Arrays.stream(genresString.split(","))
                     .map(genre -> {
                         String[] genreParts = genre.trim().split(":");
                         int genreId = Integer.parseInt(genreParts[0].trim());
                         String genreName = genreParts.length > 1 ? genreParts[1].trim() : null;
                         return new Genre(genreId, genreName);
                     })
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList()); // Собираем в список
             dto.setGenres(genres);
         } else {
-            dto.setGenres(Collections.emptySet());
+            dto.setGenres(Collections.emptyList()); // Возвращаем пустой список
         }
-
         return dto;
     }
 }

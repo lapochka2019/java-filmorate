@@ -6,8 +6,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class FilmDto {
@@ -19,6 +19,6 @@ public class FilmDto {
     private int duration;
     private int rate;
     private MpaRating mpa;
-    private Set<Integer> likes = new HashSet<>();
-    private Set<Genre> genres = new HashSet<>();
+    private List<Integer> likes = new ArrayList<>();
+    private List<Genre> genres = new ArrayList<>();
 }
