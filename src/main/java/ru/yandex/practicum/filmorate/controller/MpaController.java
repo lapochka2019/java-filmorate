@@ -9,27 +9,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/genres")
+@RequestMapping("/mpa")
 @Validated
 @AllArgsConstructor
-public class GenreController {
 
-    GenreService genreService;
+public class MpaController {
+
+    MpaService mpaService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getGenre(@PathVariable int id) {
-        return ResponseEntity.ok(genreService.getGenre(id));
+        return ResponseEntity.ok(mpaService.getMpa(id));
     }
 
     @GetMapping
     public ResponseEntity<List<FilmDto>> getFilmWithGenre() {
-        return ResponseEntity.ok(genreService.getFilmsWithGenre());
+        return ResponseEntity.ok(mpaService.getFilmsWithMpa());
     }
-
 }

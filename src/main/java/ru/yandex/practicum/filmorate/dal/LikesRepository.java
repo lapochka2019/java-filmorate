@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,19 +18,20 @@ public class LikesRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public void setLikesToFilm(int filmId, Set<Integer> likes) {
-        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+    public Set<Integer> setLikesToFilm(int filmId, Set<Integer> likes) {
+        // Запрос для добавления жанра к фильму
+        String insertSql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+
         for (Integer userId : likes) {
-            //если существует пользователь с таким айди, то добавляем
             try {
-                jdbcTemplate.update(sql, filmId, userId);
-                log.info("Пользователя с id: {} успешно добавлен к фильму {}", userId, filmId);
+                jdbcTemplate.update(insertSql, filmId, userId);
+                log.info("Лайк пользователя с id: {} успешно добавлен к фильму {}", userId, filmId);
             } catch (DataIntegrityViolationException ex) {
                 log.error("Пользователя с id: {} нет в БД", userId);
                 likes.remove(userId);
             }
         }
-
+        return likes;
     }
 
     public void updateLikes(int filmId, Set<Integer> likes) {
@@ -37,28 +40,17 @@ public class LikesRepository {
         jdbcTemplate.update(deleteSql, filmId);
         log.info("Лайки фильма с id:{} успешно удалены", filmId);
 
-        // Добавляем новые лайки
-        if (!likes.isEmpty()) {
-            String insertSql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
-            for (Integer userId : likes) {
-                //если существует пользователь с таким айди, то добавляем
-                try {
-                    jdbcTemplate.update(insertSql, filmId, userId);
-                    log.info("Пользователя с id: {} успешно добавлен к фильму {}", userId, filmId);
-                } catch (DataIntegrityViolationException ex) {
-                    log.error("Пользователя с id: {} нет в БД", userId);
-                    likes.remove(userId);
-                }
-            }
-        }
+        setLikesToFilm(filmId, likes);
     }
 
     public void addLike(int filmId, int userId) {
         String insertSql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
         try {
             jdbcTemplate.update(insertSql, filmId, userId);
-        } catch (DataIntegrityViolationException ex) {
-            log.error("Пользователя с id: {} нет в БД", userId);
+            log.info("Лайк пользователя с id: {} успешно добавлен к фильму {}", userId, filmId);
+        } catch (DataAccessException ex) {
+            log.error("Произошла ошибка. Возможно не найден пользователь {}  или фильм {}", userId, filmId);
+            throw new NotFoundException("Произошла ошибка. Возможно не найден пользователь " + userId + " или фильм " + filmId);
         }
     }
 
@@ -66,8 +58,10 @@ public class LikesRepository {
         String deleteSql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
         try {
             jdbcTemplate.update(deleteSql, filmId, userId);
-        } catch (DataIntegrityViolationException ex) {
-            log.error("Не удалось удалить лайк");
+            log.info("Пользователя с id: {} успешно удален к фильму {}", userId, filmId);
+        } catch (DataAccessException ex) {
+            log.error("Произошла ошибка. Возможно не найден пользователь {}  или фильм {}", userId, filmId);
+            throw new NotFoundException("Произошла ошибка. Возможно не найден пользователь " + userId + " или фильм " + filmId);
         }
     }
 
@@ -75,6 +69,4 @@ public class LikesRepository {
         String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
         return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, filmId));
     }
-
-
 }

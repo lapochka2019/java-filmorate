@@ -2,13 +2,16 @@ package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.mappers.FilmMapper;
+import ru.yandex.practicum.filmorate.mappers.FilmDtoMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.PreparedStatement;
@@ -23,7 +26,6 @@ import static java.sql.Types.NULL;
 public class FilmRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final FilmMapper filmMapper;
     private final LikesRepository likesRepository;
     private final GenresRepository genresRepository;
 
@@ -59,11 +61,11 @@ public class FilmRepository {
 
             // Добавляем жанры
             log.info("Вызван метод добавления жанров фильма в БД");
-            genresRepository.setGenresToFilm(filmId, film.getGenres());
+            film.setGenres(genresRepository.setGenresToFilm(filmId, film.getGenres()));
 
             // Добавляем лайки
             log.info("Вызван метод добавления лайков фильма в БД");
-            likesRepository.setLikesToFilm(filmId, film.getLikes());
+            film.setLikes(likesRepository.setLikesToFilm(filmId, film.getLikes()));
 
             // Обновляем поле rate (количество лайков)
             updateRate(filmId, film.getLikes().size());
@@ -83,9 +85,8 @@ public class FilmRepository {
             log.error("Возрастное ограничение с id: {} не найдено", film.getMpa());
         }
 
-        String sql = "UPDATE film SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=?) " +
+        String sql = "UPDATE film SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=? " +
                 "WHERE id=?";
-
         try {
             // Выполняем запрос с указанием RETURN_GENERATED_KEYS
             jdbcTemplate.update(sql,
@@ -93,6 +94,7 @@ public class FilmRepository {
                     film.getDescription(),
                     java.sql.Date.valueOf(film.getReleaseDate()),
                     film.getDuration(),
+                    film.getRate(),
                     film.getMpa(),
                     film.getId());
             log.info("Выполнено обновление фильма: {}", film.getId());
@@ -116,51 +118,60 @@ public class FilmRepository {
     }
 
     //Получить (1) + жанры + лайки
-    public Film getFilm(int filmId) {
-        String sql = "SELECT * FROM film WHERE id=?";
-        // Используем queryForObject с FilmMapper
-        Film film = jdbcTemplate.query(sql, rs -> {
-            if (!rs.next()) {
-                throw new NotFoundException("Фильм с id: " + filmId + " не найден");
-            }
-            return filmMapper.mapRow(rs, 0); // Преобразуем ResultSet в Film
-        }, filmId);
+    public FilmDto getFilm(int filmId) {
+        try {
+            String sql = "SELECT f.id, " +
+                    "       f.name, " +
+                    "       f.description, " +
+                    "       f.release_date, " +
+                    "       f.duration, " +
+                    "       f.rate, " +
+                    "       m.name AS mpa_name, " +
+                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
+                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+                    "FROM film f " +
+                    "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
+                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
+                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
+                    "WHERE f.id = ? " +
+                    "GROUP BY f.id";
 
-        if (film == null) {
-            throw new NotFoundException("Фильм с id: " + filmId + " не найден");
+            return jdbcTemplate.queryForObject(sql, new Object[]{filmId}, new FilmDtoMapper());
+        } catch (EmptyResultDataAccessException ex) {
+            log.error("Фильм с ID {} не найден", filmId);
+            throw new NotFoundException("Фильм с ID: " + filmId + " не существует");
+        } catch (DataAccessException ex) {
+            log.error("Во время получения фильма произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить фильм");
         }
-
-        // Загружаем лайки
-        film.setLikes(likesRepository.getLikesForFilm(filmId));
-
-        // Загружаем жанры
-        film.setGenres(genresRepository.getGenresForFilm(filmId));
-
-        return film;
     }
 
     //Получить (список) + жанры + лайки
-    public List<Film> getFilms() {
-        String sql = "SELECT * FROM film";
-
+    public List<FilmDto> getFilms() {
         try {
-            // Получаем все фильмы
-            List<Film> films = jdbcTemplate.query(sql, filmMapper);
-
-            // Загружаем связанные данные для каждого фильма
-            for (Film film : films) {
-                int filmId = film.getId();
-
-                // Загружаем лайки
-                film.setLikes(likesRepository.getLikesForFilm(filmId));
-
-                // Загружаем жанры
-                film.setGenres(genresRepository.getGenresForFilm(filmId));
-            }
-            return films;
-        } catch (DataIntegrityViolationException ex) {
-            log.error("Во время получения фильмов произошла непредвиденная ошибка");
-            throw new DataIntegrityViolationException("Не удалось получить список фильмов");
+            String sql = "SELECT f.id, " +
+                    "       f.name, " +
+                    "       f.description, " +
+                    "       f.release_date, " +
+                    "       f.duration, " +
+                    "       f.rate, " +
+                    "       m.name AS mpa_name, " +
+                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
+                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+                    "FROM film f " +
+                    "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
+                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
+                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
+                    "GROUP BY f.id";
+            return jdbcTemplate.query(sql, new FilmDtoMapper());
+        } catch (EmptyResultDataAccessException ex) {
+            log.error("Нет фильмов в БД");
+            throw new NotFoundException("Фильмы в БД не найдены");
+        } catch (DataAccessException ex) {
+            log.error("Во время получения фильмов произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить фильмы");
         }
     }
 
@@ -169,33 +180,38 @@ public class FilmRepository {
         likesRepository.addLike(filmId, userId);
         increaseRate(filmId);
     }
+
     //Удалить лайк
     public void deleteLike(int userId, int filmId) {
         likesRepository.removeLike(filmId, userId);
         decreaseRate(filmId);
     }
+
     //Получить топ (10) фильмов
-    public List<Film> getTopFilms(int limit){
-        String sql = "SELECT * FROM film ORDER BY rate DESC LIMIT ?";
-
+    public List<FilmDto> getTopFilms(int limit) {
         try {
-            // Получаем все фильмы
-            List<Film> films = jdbcTemplate.query(sql, filmMapper, limit);
+            String sql = "SELECT f.id, " +
+                    "       f.name, " +
+                    "       f.description, " +
+                    "       f.release_date, " +
+                    "       f.duration, " +
+                    "       f.rate, " +
+                    "       m.name AS mpa_name, " +
+                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
+                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+                    "FROM film f " +
+                    "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
+                    "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
+                    "LEFT JOIN genre g ON fg.genre_id = g.id " +
+                    "GROUP BY f.id " +
+                    "ORDER BY f.rate DESC " + // Сортировка по убыванию количества лайков
+                    "LIMIT ?"; // Ограничение на количество фильмов
 
-            // Загружаем связанные данные для каждого фильма
-            for (Film film : films) {
-                int filmId = film.getId();
-
-                // Загружаем лайки
-                film.setLikes(likesRepository.getLikesForFilm(filmId));
-
-                // Загружаем жанры
-                film.setGenres(genresRepository.getGenresForFilm(filmId));
-            }
-            return films;
-        } catch (DataIntegrityViolationException ex) {
-            log.error("Во время получения фильмов произошла непредвиденная ошибка");
-            throw new DataIntegrityViolationException("Не удалось получить список фильмов");
+            return jdbcTemplate.query(sql, new Object[]{limit}, new FilmDtoMapper());
+        } catch (DataAccessException ex) {
+            log.error("Во время получения фильмов произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить фильмы");
         }
     }
 
@@ -208,8 +224,12 @@ public class FilmRepository {
 
     public void updateRate(int filmId, int rate) {
         String updateRateSql = "UPDATE film SET rate = ? WHERE id = ?";
-        jdbcTemplate.update(updateRateSql, rate, filmId);
-        log.info("Значение поля rate актуализировано");
+        try {
+            jdbcTemplate.update(updateRateSql, rate, filmId);
+            log.info("Значение поля rate актуализировано");
+        } catch (DataIntegrityViolationException ex) {
+            log.error("Не удалось актуализировать значение поля rate ");
+        }
     }
 
     public void increaseRate(int filmId) {
@@ -217,18 +237,20 @@ public class FilmRepository {
         String updateRateSql = "UPDATE film SET rate = rate + 1 WHERE id = ?";
         try {
             jdbcTemplate.update(updateRateSql, filmId);
+            log.info("Значение поля rate актуализировано");
         } catch (DataIntegrityViolationException ex) {
-            log.error("Не удалось скорректировать рейтинг фильма");
+            log.error("Не удалось актуализировать значение поля rate ");
         }
     }
 
-    public void decreaseRate(int filmId){
+    public void decreaseRate(int filmId) {
         // Уменьшаем количество лайков
         String updateRateSql = "UPDATE film SET rate = GREATEST(rate - 1, 0) WHERE id = ?";
         try {
             jdbcTemplate.update(updateRateSql, filmId);
+            log.info("Значение поля rate актуализировано");
         } catch (DataIntegrityViolationException ex) {
-            log.error("Не удалось скорректировать рейтинг фильма");
+            log.error("Не удалось актуализировать значение поля rate ");
         }
     }
 }

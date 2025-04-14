@@ -3,98 +3,62 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserService {
-    UserStorage userStorage;
+    UserRepository userRepository;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserRepository userStorage) {
+        this.userRepository = userStorage;
     }
 
     //добавить в друзья
     public void addFriend(int firstId, int secondId) {
         log.info("Пользователь {} пытается добавить в друзья пользователя {}", firstId, secondId);
-        try {
-            User firstUser = userStorage.getUser(firstId);
-            User secondUser = userStorage.getUser(secondId);
-            firstUser.addFriend(secondId);
-            secondUser.addFriend(firstId);
-            log.info("Добавление в друзья удалось");
-        } catch (NotFoundException e) {
-            log.warn("Не удалось добавить пользователей в друзья: {}", e.getMessage());
-            throw e;
-        }
+        userRepository.addFriend(firstId, secondId);
     }
 
     //удалить из друзей
     public void deleteFriend(int firstId, int secondId) {
-        log.info("Пользователь {} пытается удалить пользователя {} из друзей", firstId, secondId);
-        try {
-            User firstUser = userStorage.getUser(firstId);
-            User secondUser = userStorage.getUser(secondId);
-            firstUser.deleteFriend(secondId);
-            secondUser.deleteFriend(firstId);
-            log.info("Удаление из друзей удалось");
-        } catch (NotFoundException e) {
-            log.warn("Не удалось удалить пользователя из друзей: {}", e.getMessage());
-            throw e;
-        }
+        userRepository.deleteFriend(firstId, secondId);
     }
 
     //список друзей
-    public List<User> getFriends(int id) {
+    public List<UserDto> getFriends(int id) {
         log.info("Попытка получить друзей пользователя {}", id);
-        try {
-            User user = userStorage.getUser(id);
-            log.info("Получение друзей удалось");
-            return user.getFriends().stream()
-                    .map(userStorage::getUser)
-                    .collect(Collectors.toList());
-        } catch (NotFoundException e) {
-            log.warn("Не удалось получить друзей пользователя: {}", e.getMessage());
-            throw e;
-        }
+        return userRepository.getFriends(id);
     }
 
     //список общих друзей
-    public List<User> getMutualFriends(int firstId, int secondId) {
+    public List<UserDto> getMutualFriends(int firstId, int secondId) {
         log.info("Попытка получить общих друзей пользователей {} и {}", firstId, secondId);
-        try {
-            User firstUser = userStorage.getUser(firstId);
-            User secondUser = userStorage.getUser(secondId);
-            log.info("Получение общих друзей");
-            return firstUser.getFriends().stream()
-                    .filter(secondUser.getFriends()::contains).map(userStorage::getUser)
-                    .collect(Collectors.toList());
-        } catch (NotFoundException e) {
-            log.warn("Не удалось получить общих друзей: {}", e.getMessage());
-            throw e;
-        }
+        return userRepository.getMutualFriends(firstId, secondId);
     }
 
     public void addUser(User user) {
-        userStorage.addUser(user);
+        log.info("Попытка добавить пользователя с id:{}", user.getId());
+        userRepository.addUser(user);
     }
 
     public void updateUser(User user) {
-        userStorage.updateUser(user);
+        log.info("Попытка обновить пользователя с id:{}", user.getId());
+        userRepository.updateUser(user);
     }
 
-    public User getUser(int id) {
-        return userStorage.getUser(id);
+    public UserDto getUser(int id) {
+        log.info("Попытка получить пользователя с id:{}", id);
+        return userRepository.getUser(id);
     }
 
-    public ArrayList<User> getUsers() {
-        return userStorage.getUsers();
+    public List<UserDto> getUsers() {
+        log.info("Попытка получить всех пользователей");
+        return userRepository.getUsers();
     }
 }

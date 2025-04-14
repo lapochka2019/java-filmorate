@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Rating {
+public class MpaRating {
     //    целочисленный идентификатор
     private int id;
     //    название

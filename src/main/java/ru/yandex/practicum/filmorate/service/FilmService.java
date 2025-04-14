@@ -4,54 +4,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
 public class FilmService {
-    UserStorage userStorage;
     FilmRepository filmRepository;
 
     @Autowired
-    public FilmService(UserStorage userStorage,FilmRepository filmRepository) {
-        this.userStorage = userStorage;
+    public FilmService(FilmRepository filmRepository) {
         this.filmRepository = filmRepository;
     }
 
     //поставить лайк
     public void addLike(int userId, int filmId) {
-        log.info("Пользователь {} пытается поставить лайк фильму {}", userId, filmId);
-        try {
-            userStorage.getUser(userId);//выбросит исключение
-            Film film = filmRepository.getFilm(filmId);
-            log.info("Лайк поставлен успешно");
-        } catch (NotFoundException e) {
-            log.warn("Поставить лайк не удалось: {}", e.getMessage());
-            throw e;
-        }
+        filmRepository.addLike(userId, filmId);//выбросит исключение
     }
 
     //удалить лайк
     public void deleteLike(int userId, int filmId) {
-        log.info("Пользователь {} пытается удалить лайк у фильма {}", userId, filmId);
-        try {
-            Film film = filmRepository.getFilm(filmId);
-            log.info("Лайк удален успешно");
-        } catch (NotFoundException e) {
-            log.warn("Удалить лайк не удалось: {}", e.getMessage());
-            throw e;
-        }
+        filmRepository.deleteLike(userId, filmId);
     }
 
     //топ 10 фильмов (по кол-ву лайков)
-    public List<Film> getTopFilms(int limit) {
-        log.info("Получены лучшие {} фильмов", limit);
+    public List<FilmDto> getTopFilms(int limit) {
         return filmRepository.getTopFilms(limit);
     }
 
@@ -63,11 +42,11 @@ public class FilmService {
         filmRepository.updateFilm(film);
     }
 
-    public Film getFilm(int id) {
+    public FilmDto getFilm(int id) {
         return filmRepository.getFilm(id);
     }
 
-    public List<Film> getFilms() {
+    public List<FilmDto> getFilms() {
         return filmRepository.getFilms();
     }
 }
