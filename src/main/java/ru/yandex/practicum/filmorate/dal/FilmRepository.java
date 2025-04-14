@@ -28,6 +28,7 @@ public class FilmRepository {
     private final JdbcTemplate jdbcTemplate;
     private final LikesRepository likesRepository;
     private final GenresRepository genresRepository;
+    private final MpaRepository mpaRepository;
 
     //Создать
     public void addFilm(Film film) {
@@ -69,7 +70,10 @@ public class FilmRepository {
 
             // Обновляем поле rate (количество лайков)
             updateRate(filmId, film.getLikes().size());
-
+            // Подтягиваем данные для MPA
+            film.setMpa(mpaRepository.getMpa(film.getMpa().getId()));
+            // Подтягиваем данные для жанров
+            film.setGenres(genresRepository.getGenresByFilm(filmId));
 
         } catch (DataIntegrityViolationException ex) {
             log.error("Во время добавления фильма в БД произошла непредвиденная ошибка");
@@ -126,9 +130,10 @@ public class FilmRepository {
                     "       f.release_date, " +
                     "       f.duration, " +
                     "       f.rate, " +
+                    "       m.id AS mpa_id, " +
                     "       m.name AS mpa_name, " +
-                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
-                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+                    "       LISTAGG(DISTINCT COALESCE(fl.user_id, ''), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
+                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id, ''), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
@@ -137,12 +142,14 @@ public class FilmRepository {
                     "WHERE f.id = ? " +
                     "GROUP BY f.id";
 
+            log.info("Выполняется запрос к базе данных для получения фильма с ID: {}", filmId);
+
             return jdbcTemplate.queryForObject(sql, new Object[]{filmId}, new FilmDtoMapper());
         } catch (EmptyResultDataAccessException ex) {
             log.error("Фильм с ID {} не найден", filmId);
             throw new NotFoundException("Фильм с ID: " + filmId + " не существует");
         } catch (DataAccessException ex) {
-            log.error("Во время получения фильма произошла непредвиденная ошибка: {}", ex.getMessage());
+            log.error("Ошибка при выполнении запроса: {}", ex.getMessage());
             throw new DataIntegrityViolationException("Не удалось получить фильм");
         }
     }
@@ -156,9 +163,10 @@ public class FilmRepository {
                     "       f.release_date, " +
                     "       f.duration, " +
                     "       f.rate, " +
+                    "       m.id AS mpa_id, " +
                     "       m.name AS mpa_name, " +
-                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
-                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+                    "       LISTAGG(DISTINCT COALESCE(fl.user_id, ''), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
+                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id, ''), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
@@ -196,17 +204,18 @@ public class FilmRepository {
                     "       f.release_date, " +
                     "       f.duration, " +
                     "       f.rate, " +
+                    "       m.id AS mpa_id, " +
                     "       m.name AS mpa_name, " +
-                    "       LISTAGG(DISTINCT fl.user_id, ',') AS likes, " +
-                    "       LISTAGG(DISTINCT g.name, ',') AS genres " +
+                    "       LISTAGG(DISTINCT COALESCE(fl.user_id, ''), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
+                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id, ''), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                     "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
                     "LEFT JOIN genre g ON fg.genre_id = g.id " +
                     "GROUP BY f.id " +
-                    "ORDER BY f.rate DESC " + // Сортировка по убыванию количества лайков
-                    "LIMIT ?"; // Ограничение на количество фильмов
+                    "ORDER BY f.rate DESC " +
+                    "LIMIT ?";
 
             return jdbcTemplate.query(sql, new Object[]{limit}, new FilmDtoMapper());
         } catch (DataAccessException ex) {

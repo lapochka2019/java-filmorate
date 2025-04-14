@@ -3,11 +3,15 @@ package ru.yandex.practicum.filmorate.mappers;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class FilmDtoMapper implements RowMapper<FilmDto> {
@@ -15,34 +19,50 @@ public class FilmDtoMapper implements RowMapper<FilmDto> {
     public FilmDto mapRow(ResultSet rs, int rowNum) throws SQLException {
         FilmDto dto = new FilmDto();
 
+        // Базовые поля
         dto.setId(rs.getInt("id"));
         dto.setName(rs.getString("name"));
         dto.setDescription(rs.getString("description"));
         dto.setReleaseDate(rs.getDate("release_date").toLocalDate());
         dto.setDuration(rs.getInt("duration"));
         dto.setRate(rs.getInt("rate"));
-        dto.setMpa(rs.getString("mpa_name"));
 
-        // Обработка NULL для likes
-        String likesString = rs.getString("likes");
-        if (likesString != null && !likesString.isEmpty()) {
-            String[] likesArray = likesString.split(",");
-            Set<Integer> likes = new HashSet<>();
-            for (String like : likesArray) {
-                likes.add(Integer.parseInt(like.trim()));
-            }
-            dto.setLikes(likes);
+        // Поле MPA
+        int mpaId = rs.getInt("mpa_id");
+        if (!rs.wasNull()) {
+            String mpaName = rs.getString("mpa_name");
+            dto.setMpa(new MpaRating(mpaId, mpaName));
+        } else {
+            dto.setMpa(null); // Устанавливаем null, если MPA отсутствует
         }
 
-        // Обработка NULL для genres
+// Поле likes
+        String likesString = rs.getString("likes");
+        if (likesString != null && !likesString.isEmpty()) {
+            Set<Integer> likes = Arrays.stream(likesString.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty()) // Фильтруем пустые строки
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toSet());
+            dto.setLikes(likes);
+        } else {
+            dto.setLikes(Collections.emptySet());
+        }
+
+// Поле genres
         String genresString = rs.getString("genres");
         if (genresString != null && !genresString.isEmpty()) {
-            String[] genresArray = genresString.split(",");
-            Set<String> genres = new HashSet<>();
-            for (String genre : genresArray) {
-                genres.add(genre.trim());
-            }
+            Set<Genre> genres = Arrays.stream(genresString.split(","))
+                    .map(genre -> {
+                        String[] genreParts = genre.trim().split(":");
+                        int genreId = Integer.parseInt(genreParts[0].trim());
+                        String genreName = genreParts.length > 1 ? genreParts[1].trim() : null;
+                        return new Genre(genreId, genreName);
+                    })
+                    .collect(Collectors.toSet());
             dto.setGenres(genres);
+        } else {
+            dto.setGenres(Collections.emptySet());
         }
 
         return dto;

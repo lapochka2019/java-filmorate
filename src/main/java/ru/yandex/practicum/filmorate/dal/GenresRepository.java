@@ -21,6 +21,24 @@ public class GenresRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    //получить жанры фильма
+    public Set<Genre> getGenresByFilm(int id) {
+        try {
+            String sql = "SELECT g.id AS genre_id, g.name AS genre_name" +
+                    "FROM film f" +
+                    "JOIN film_genre fg ON f.id = fg.film_id" +
+                    "JOIN genre g ON fg.genre_id = g.id" +
+                    "WHERE f.id = ?";
+            return (Set<Genre>) jdbcTemplate.query(sql, new GenreMapper(), id);
+        } catch (EmptyResultDataAccessException ex) {
+            log.error("Не удалось получить жанры");
+            throw new NotFoundException("Не удалось получить жанры");
+        } catch (DataAccessException ex) {
+            log.error("Во время получения жанров произошла непредвиденная ошибка: {}", ex.getMessage());
+            throw new DataIntegrityViolationException("Не удалось получить жанры");
+        }
+    }
+
     // Добавление жанров к фильму
     public Set<Genre> setGenresToFilm(int filmId, Set<Genre> genres) {
         // Запрос для добавления жанра к фильму

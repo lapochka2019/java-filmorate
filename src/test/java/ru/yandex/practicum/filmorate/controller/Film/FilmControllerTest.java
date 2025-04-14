@@ -28,7 +28,6 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Получение одного фильма по ID. Успешно")
     void testGetFilmById_Success() throws Exception {
-        // Act & Assert: Выполняем GET-запрос и проверяем результат
         mockMvc.perform(get("/films/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -39,7 +38,6 @@ public class FilmControllerTest {
     @Test
     @DisplayName("Получение одного фильма по ID. Не успешно")
     void testGetFilmById_NotFound() throws Exception {
-        // Act & Assert: Выполняем GET-запрос и проверяем результат
         mockMvc.perform(get("/films/{id}", 10)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
