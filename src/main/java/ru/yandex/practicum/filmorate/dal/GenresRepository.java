@@ -64,6 +64,7 @@ public class GenresRepository {
 
     public void updateGenres(int filmId, List<Genre> genres) {
         // Удаляем старые жанры
+        log.info("Удаляем все жанры фильма {}", filmId);
         try {
             String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
             jdbcTemplate.update(deleteSql, filmId);
@@ -75,7 +76,7 @@ public class GenresRepository {
         setGenresToFilm(filmId, genres);
     }
 
-    public void checkGenre(List<Genre> genres) {
+    public void checkGenres(List<Genre> genres) {
         log.info("Проверяем, что список жанров не пуст");
         // Проверяем, что список жанров не пуст
         if (genres == null || genres.isEmpty()) {

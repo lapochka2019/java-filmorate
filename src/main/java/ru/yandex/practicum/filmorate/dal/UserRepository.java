@@ -32,6 +32,7 @@ public class UserRepository {
 
     //Добавить
     public void addUser(User user) {
+
         String sql = "INSERT INTO consumer (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
@@ -47,6 +48,7 @@ public class UserRepository {
             int userId = keyHolder.getKey().intValue();
             user.setId(userId);
             log.info("Выполнено добавление нового пользователя в БД. ID пользователя: {}", userId);
+            log.info(user.toString());
             // Добавляем друзей
             log.info("Вызван метод добавления друзей пользователя в БД");
             friendshipRepository.setFriends(userId, user.getFriends());
@@ -59,6 +61,7 @@ public class UserRepository {
 
     //Редактировать
     public void updateUser(User user) {
+        log.info("Выполняется обновление пользователя с ID пользователя: {}", user.getId());
         // Проверяем, существует ли пользователь в БД
         checkUserExists(user.getId());
 
@@ -85,6 +88,7 @@ public class UserRepository {
 
     // Метод для проверки существования пользователя в БД
     public void checkUserExists(int userId) {
+        log.info("Проверяем, существует ли пользователь с ID {}", userId);
         String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         if (count == null || count == 0) {
@@ -95,6 +99,7 @@ public class UserRepository {
 
     //Получить (1)
     public UserDto getUser(int id) {
+        log.info("Пытаемся получить данные пользователя ID {}", id);
         String sql = "SELECT id, email, login, name, birthday FROM consumer WHERE id = ?";
         try {
             UserDto user = jdbcTemplate.queryForObject(sql, new UserDtoMapper(), id);
@@ -110,6 +115,7 @@ public class UserRepository {
 
     //Получить всех
     public List<UserDto> getUsers() {
+        log.info("Пытаемся получить данные всех пользователей");
         String sql = "SELECT id, email, login, name, birthday FROM consumer";
         try {
             // Получаем всех пользователей
@@ -124,6 +130,7 @@ public class UserRepository {
 
     //Отправить запрос в друзья
     public void addFriend(int firstId, int secondId) {
+        log.info("Пытаемся добавить пользователя {} в друзья к пользователю {}", secondId, firstId);
         // Проверяем, существует ли пользователь в БД
         checkUserExists(firstId);
         // Проверяем, существует ли пользователь в БД
@@ -132,6 +139,7 @@ public class UserRepository {
         Optional<Integer> friendship = friendshipRepository.getFriendshipType(secondId, firstId);
         //если есть, то подтверждаем дружбу
         if (friendship.isPresent()) {
+            log.info("Пользователь {} уже отправлял запрос в друзья к пользователю {}", firstId, secondId);
             friendshipRepository.confirmFriendship(secondId, firstId);
         }
         //если нет, то создаем
@@ -140,6 +148,7 @@ public class UserRepository {
 
     //Удалить из друзей
     public void deleteFriend(int firstId, int secondId) {
+        log.info("Пользователь {} хочет удалить из друзей пользователя {}", firstId, secondId);
         // Проверяем, существует ли пользователь в БД
         checkUserExists(firstId);
         // Проверяем, существует ли пользователь в БД
@@ -151,22 +160,26 @@ public class UserRepository {
             int friendship = friendshipOpt.get();
             //Если дружба не подтверждена
             if (friendship == 1) {
+                log.info("Пользователь {} отменяет свою заявку в друзья к пользователю {}", firstId, secondId);
                 //то удаляем
                 friendshipRepository.removeFriend(firstId, secondId);
             } else {
                 //Если дружба подтверждена
+                log.info("Пользователь {} отменяет отменяет подтверждение дружбы с пользователем {}", firstId, secondId);
                 //Удаляем
                 friendshipRepository.removeFriend(firstId, secondId);
                 //Возвращаем заявку в друзья
                 friendshipRepository.addFriend(secondId, firstId);
             }
         } else {
+            log.error("Пользователи {} и {} не являются друзьями", firstId, secondId);
             //throw new NotFoundException("Данные пользователи не являются друзьями");
         }
     }
 
     //Получить друзей
     public List<UserDto> getFriends(int id) {
+        log.info("Получаем список всех друзей пользователя {}", id);
         checkUserExists(id);
         List<UserDto> friendsList = new ArrayList<>();
         Set<Integer> friends = friendshipRepository.getFriendsForUser(id);
@@ -178,6 +191,7 @@ public class UserRepository {
 
     //Получить общих друзей
     public List<UserDto> getMutualFriends(int firstId, int secondId) {
+        log.info("Получаем список общих друзей пользователей {} и {}", secondId, firstId);
         // Проверяем, существует ли пользователь в БД
         checkUserExists(firstId);
         // Проверяем, существует ли пользователь в БД

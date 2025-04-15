@@ -30,7 +30,7 @@ public class FilmRepository {
 
     public void addFilm(Film film) {
         checkMpaRating(film.getMpa().getId());
-        genresRepository.checkGenre(film.getGenres());
+        genresRepository.checkGenres(film.getGenres());
 
         String sql = "INSERT INTO film (name, description, release_date, duration, rate, mpa_rating_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -84,7 +84,7 @@ public class FilmRepository {
         checkFilmExists(film.getId());
         //Проверяем возрастной рейтинг
         checkMpaRating(film.getMpa().getId());
-        genresRepository.checkGenre(film.getGenres());
+        genresRepository.checkGenres(film.getGenres());
 
         String sql = "UPDATE film SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=? " +
                 "WHERE id=?";
