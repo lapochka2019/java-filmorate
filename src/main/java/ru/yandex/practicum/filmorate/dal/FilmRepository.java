@@ -129,8 +129,8 @@ public class FilmRepository {
                     "       f.rate, " +
                     "       m.id AS mpa_id, " +
                     "       m.name AS mpa_name, " +
-                    "       LISTAGG(DISTINCT COALESCE(fl.user_id, ''), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
-                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id, ''), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
+                    "       LISTAGG(DISTINCT COALESCE(fl.user_id), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
+                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
@@ -188,8 +188,8 @@ public class FilmRepository {
                     "       f.rate, " +
                     "       m.id AS mpa_id, " +
                     "       m.name AS mpa_name, " +
-                    "       LISTAGG(DISTINCT COALESCE(fl.user_id, ''), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
-                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id, ''), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
+                    "       LISTAGG(DISTINCT COALESCE(fl.user_id), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
+                    "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
