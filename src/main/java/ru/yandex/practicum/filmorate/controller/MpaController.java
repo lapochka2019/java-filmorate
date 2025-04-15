@@ -29,7 +29,7 @@ public class MpaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MpaRating>> getMpaRatings() {
-        return ResponseEntity.ok(mpaService.getMpaRatings());
+    public ResponseEntity<List<MpaRating>> getAllMpa() {
+        return ResponseEntity.ok(mpaService.getAllMpa());
     }
 }

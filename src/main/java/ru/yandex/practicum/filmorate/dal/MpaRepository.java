@@ -21,7 +21,7 @@ public class MpaRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public MpaRating getMpa(int id) {
-        log.info("Получаем MpaRating с ID {}", id);
+        log.info("Получаем Mpa с ID {}", id);
         try {
             String sql = "SELECT id, name FROM mpa_rating WHERE id =?";
             return jdbcTemplate.queryForObject(sql, new MpaRatingMapper(), id);
@@ -34,8 +34,8 @@ public class MpaRepository {
         }
     }
 
-    public List<MpaRating> getMpaRatings() {
-        log.info("Получаем список всех MpaRating");
+    public List<MpaRating> getAllMpa() {
+        log.info("Получаем список всех Mpa");
         try {
             String sql = "SELECT id, name FROM mpa_rating";
             return jdbcTemplate.query(sql, new MpaRatingMapper());

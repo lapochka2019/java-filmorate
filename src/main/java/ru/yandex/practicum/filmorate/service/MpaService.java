@@ -20,8 +20,8 @@ public class MpaService {
         return mpaRepository.getMpa(id);
     }
 
-    public List<MpaRating> getMpaRatings() {
+    public List<MpaRating> getAllMpa() {
         log.info("Попытка получить список МРА рейтингов");
-        return mpaRepository.getMpaRatings();
+        return mpaRepository.getAllMpa();
     }
 }

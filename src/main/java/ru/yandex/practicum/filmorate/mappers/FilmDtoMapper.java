@@ -52,7 +52,7 @@ public class FilmDtoMapper implements RowMapper<FilmDto> {
 
 // Поле genres
         String genresString = rs.getString("genres");
-        if (genresString != null && !genresString.isEmpty()) {
+        if (genresString != null && !genresString.isEmpty() && !genresString.equals(":")) {
             List<Genre> genres = Arrays.stream(genresString.split(","))
                     .map(genre -> {
                         String[] genreParts = genre.trim().split(":");
