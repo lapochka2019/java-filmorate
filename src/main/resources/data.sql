@@ -38,8 +38,8 @@ INSERT INTO film (name, description, release_date, duration, mpa_rating_id) VALU
 ('Фильм 4', 'Описание фильма 4', '2018-11-05', 110, 4), -- Рейтинг R
 ('Фильм 5', 'Описание фильма 5', '2022-07-25', 130, 5); -- Рейтинг NC-17
 
-DELETE FROM film_genre;
-INSERT INTO film_genre (film_id, genre_id) VALUES
+DELETE FROM film_genres;
+INSERT INTO film_genres (film_id, genre_id) VALUES
 (1, 1), -- Фильм 1 связан с жанром "Комедия"
 (1, 2), -- Фильм 1 также связан с жанром "Драма"
 (2, 3), -- Фильм 2 связан с жанром "Мультфильм"

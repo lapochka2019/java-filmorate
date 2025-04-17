@@ -1,6 +1,6 @@
 -- Удаление зависимых таблиц
 DROP TABLE IF EXISTS film_likes;
-DROP TABLE IF EXISTS film_genre;
+DROP TABLE IF EXISTS film_genres;
 DROP TABLE IF EXISTS user_friends;
 
 -- Удаление таблиц с внешними ключами
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS film_likes (
 );
 
 -- Создание таблицы Film_Genre
-CREATE TABLE IF NOT EXISTS film_genre (
+CREATE TABLE IF NOT EXISTS film_genres (
     film_id INT,
     genre_id INT,
     PRIMARY KEY (film_id, genre_id),

@@ -25,7 +25,7 @@ public class GenresRepository {
         log.info("Получаем список жанров для фильма ID {}", id);
         String sql = "SELECT g.id AS genre_id, g.name AS genre_name " +
                 "FROM film f " +
-                "JOIN film_genre fg ON f.id = fg.film_id " +
+                "JOIN film_genres fg ON f.id = fg.film_id " +
                 "JOIN genre g ON fg.genre_id = g.id " +
                 "WHERE f.id = ?";
 
@@ -44,7 +44,7 @@ public class GenresRepository {
         List<Genre> result = new ArrayList<>();
         log.info("Вносим в таблицу жанры фильма ID {}", filmId);
         // Запрос для добавления жанра к фильму
-        String insertSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
+        String insertSql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
 
         for (Genre genre : genres) {
             // Проверяем, существует ли жанр в списке
@@ -63,7 +63,7 @@ public class GenresRepository {
         // Удаляем старые жанры
         log.info("Удаляем все жанры фильма {}", filmId);
         try {
-            String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
+            String deleteSql = "DELETE FROM film_genres WHERE film_id = ?";
             jdbcTemplate.update(deleteSql, filmId);
             log.info("Жанры фильма с id:{} успешно удалены", filmId);
             setGenresToFilm(filmId, genres);

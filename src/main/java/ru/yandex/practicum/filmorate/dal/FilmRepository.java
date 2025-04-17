@@ -134,7 +134,7 @@ public class FilmRepository {
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
+                    "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
                     "LEFT JOIN genre g ON fg.genre_id = g.id " +
                     "WHERE f.id = ? " +
                     "GROUP BY f.id";
@@ -164,7 +164,7 @@ public class FilmRepository {
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
+                    "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
                     "LEFT JOIN genre g ON fg.genre_id = g.id " +
                     "GROUP BY f.id";
             return jdbcTemplate.query(sql, new FilmDtoMapper());
@@ -193,7 +193,7 @@ public class FilmRepository {
                     "FROM film f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                    "LEFT JOIN film_genre fg ON f.id = fg.film_id " +
+                    "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
                     "LEFT JOIN genre g ON fg.genre_id = g.id " +
                     "GROUP BY f.id " +
                     "ORDER BY f.rate DESC " +
