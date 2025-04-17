@@ -27,7 +27,6 @@ import java.util.Set;
 public class UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final UserDtoMapper userMapper;
     private final FriendshipRepository friendshipRepository;
 
     //Добавить
@@ -89,9 +88,9 @@ public class UserRepository {
     // Метод для проверки существования пользователя в БД
     public void checkUserExists(int userId) {
         log.info("Проверяем, существует ли пользователь с ID {}", userId);
-        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
-        if (count == null || count == 0) {
+        String sql = "SELECT EXISTS(SELECT 1 FROM consumer WHERE id=?);";
+        Boolean isExists = jdbcTemplate.queryForObject(sql, Boolean.class, userId);
+        if (!isExists) {
             log.error("Пользователь с ID {} не найден", userId);
             throw new NotFoundException("Пользователь с ID " + userId + " не найден");
         }

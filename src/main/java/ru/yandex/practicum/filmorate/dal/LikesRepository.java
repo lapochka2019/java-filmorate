@@ -29,7 +29,7 @@ public class LikesRepository {
         for (Integer userId : likes) {
             try {
                 // Проверяем, существует ли пользователь
-                if (!userExists(userId)) {
+                if (!isUserExists(userId)) {
                     log.error("Пользователя с id: {} нет в БД", userId);
                     continue; // Пропускаем этого пользователя
                 }
@@ -67,7 +67,7 @@ public class LikesRepository {
         }
 
         // Проверка существования пользователя
-        if (!userExists(userId)) {
+        if (!isUserExists(userId)) {
             log.error("Пользователь с id {} не найден", userId);
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
@@ -89,10 +89,10 @@ public class LikesRepository {
         return count != null && count > 0;
     }
 
-    private boolean userExists(int userId) {
-        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
-        return count != null && count > 0;
+    private boolean isUserExists(int userId) {
+        log.info("Проверяем, существует ли пользователь с ID {}", userId);
+        String sql = "SELECT EXISTS(SELECT 1 FROM consumer WHERE id=?);";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, userId);
     }
 
     public void removeLike(int filmId, int userId) {

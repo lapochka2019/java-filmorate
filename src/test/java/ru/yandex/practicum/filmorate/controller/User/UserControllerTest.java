@@ -77,7 +77,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Добавление в друзья. Пользователь не найден)")
+    @DisplayName("Добавление в друзья. Пользователь не найден")
     void testAddFriend_UserNotFound() throws Exception {
         mockMvc.perform(put("/users/{id}/friends/{friendId}", 999, 2)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -147,7 +147,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Получение общих друзей. Нет общих друзей)")
+    @DisplayName("Получение общих друзей. Нет общих друзей")
     void testGetMutualFriends_NoMutualFriends() throws Exception {
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", 1, 2)
                         .contentType(MediaType.APPLICATION_JSON))
