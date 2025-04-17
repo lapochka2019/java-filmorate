@@ -60,7 +60,7 @@ public class UserControllerTest {
 
     @Test
     @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @DisplayName("Получение всех пользователей. База данных пуста)")
+    @DisplayName("Получение всех пользователей. База данных пуста")
     void testGetUsers_EmptyDatabase() throws Exception {
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -129,7 +129,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Получение всех друзей. У пользователя нет друзей)")
+    @DisplayName("Получение всех друзей. У пользователя нет друзей")
     void testGetFriends_NoFriends() throws Exception {
         mockMvc.perform(get("/users/{id}/friends", 5)
                         .contentType(MediaType.APPLICATION_JSON))

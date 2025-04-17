@@ -219,10 +219,12 @@ public class FilmRepository {
     }
 
     public void checkFilmExists(int filmId) {
-        String sql = "SELECT EXISTS(SELECT 1 FROM films WHERE id=?);";
+        String sql = "SELECT COUNT(*) FROM films WHERE id = ?";
         Boolean isExists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId);
 
-        if (!isExists) {
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+
+        if (count == null || count == 0) {
             log.warn("Фильм с ID {} не найден в базе данных", filmId);
             throw new NotFoundException("Фильм с ID " + filmId + " не существует");
         }
@@ -231,9 +233,9 @@ public class FilmRepository {
     }
 
     private void checkMpaRatingExists(int ratingId) {
-        String sql = "SELECT EXISTS(SELECT 1 FROM mpa_rating WHERE id=?);";
-        Boolean isExists = jdbcTemplate.queryForObject(sql, Boolean.class, ratingId);
-        if (!isExists) {
+        String sql = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, ratingId);
+        if (count == null || count == 0) {
             log.error("Пользователь с ID {} не найден", ratingId);
             throw new NotFoundException("Пользователь с ID " + ratingId + " не найден");
         }
