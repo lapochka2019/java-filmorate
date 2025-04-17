@@ -11,10 +11,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,6 +75,7 @@ public class GenresRepository {
 
     public void checkGenres(List<Genre> genres) {
         log.info("Проверяем, что список жанров не пуст");
+
         // Проверяем, что список жанров не пуст
         if (genres == null || genres.isEmpty()) {
             log.warn("Список жанров пуст");
@@ -91,18 +89,22 @@ public class GenresRepository {
 
         // Формируем строку плейсхолдеров
         String placeholders = String.join(",", Collections.nCopies(genreIds.size(), "?"));
-        String sql = "SELECT COUNT(*) FROM genre WHERE id IN (" + placeholders + ")";
+        String sql = "SELECT id FROM genre WHERE id IN (" + placeholders + ")";
 
-        // Выполняем запрос
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, genreIds.toArray());
+        // Выполняем запрос и получаем найденные id
+        List<Integer> foundGenreIds = jdbcTemplate.queryForList(sql, Integer.class, genreIds.toArray());
 
-        // Проверяем количество найденных жанров
-        if (count == null || count < genreIds.size()) {
-            log.warn("Не все жанры с ID {} найдены в базе данных", genreIds);
-            throw new NotFoundException("Не все жанры найдены в базе данных");
+        // Находим отсутствующие жанры
+        Set<Integer> notFoundGenreIds = new HashSet<>(genreIds);
+        notFoundGenreIds.removeAll(foundGenreIds);
+
+        // Если есть отсутствующие жанры, выбрасываем исключение
+        if (!notFoundGenreIds.isEmpty()) {
+            log.warn("Не найдены жанры с ID: {}", notFoundGenreIds);
+            throw new NotFoundException("Не найдены жанры с ID: " + notFoundGenreIds);
         }
 
-        log.info("Все жанры с ID {} найдены в базе данных", genreIds);
+        log.info("Все жанры найдены в базе данных");
     }
 
     public Genre getGenre(int id) {
