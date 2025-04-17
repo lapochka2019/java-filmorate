@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS user_friends;
 
 -- Удаление таблиц с внешними ключами
 DROP TABLE IF EXISTS film;
-DROP TABLE IF EXISTS consumer;
+DROP TABLE IF EXISTS users;
 
 -- Удаление независимых таблиц
 DROP TABLE IF EXISTS mpa_rating;
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS friendship_type (
 );
 
 -- Создание таблицы Consumer
-CREATE TABLE IF NOT EXISTS consumer (
+CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
     login VARCHAR(100) NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS film_likes (
     user_id INT,
     PRIMARY KEY (film_id, user_id),
     FOREIGN KEY (film_id) REFERENCES film(id),
-    FOREIGN KEY (user_id) REFERENCES consumer(id)
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Создание таблицы Film_Genre
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS user_friends (
     friend_id INT,
     friendship_type_id INT,
     PRIMARY KEY (user_id, friend_id),
-    FOREIGN KEY (user_id) REFERENCES consumer(id),
-    FOREIGN KEY (friend_id) REFERENCES consumer(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (friend_id) REFERENCES users(id),
     FOREIGN KEY (friendship_type_id) REFERENCES friendship_type(id)
 );

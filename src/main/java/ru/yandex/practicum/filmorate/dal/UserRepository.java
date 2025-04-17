@@ -33,7 +33,7 @@ public class UserRepository {
     //Добавить
     public void addUser(User user) {
 
-        String sql = "INSERT INTO consumer (email, login, name, birthday) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
             jdbcTemplate.update(connection -> {
@@ -66,7 +66,7 @@ public class UserRepository {
         checkUserExists(user.getId());
 
         // SQL-запрос для обновления данных пользователя
-        String sql = "UPDATE consumer SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
         try {
             jdbcTemplate.update(sql,
                     user.getEmail(),
@@ -89,7 +89,7 @@ public class UserRepository {
     // Метод для проверки существования пользователя в БД
     public void checkUserExists(int userId) {
         log.info("Проверяем, существует ли пользователь с ID {}", userId);
-        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         if (count == null || count == 0) {
             log.error("Пользователь с ID {} не найден", userId);
@@ -100,7 +100,7 @@ public class UserRepository {
     //Получить (1)
     public UserDto getUser(int id) {
         log.info("Пытаемся получить данные пользователя ID {}", id);
-        String sql = "SELECT id, email, login, name, birthday FROM consumer WHERE id = ?";
+        String sql = "SELECT id, email, login, name, birthday FROM users WHERE id = ?";
         try {
             UserDto user = jdbcTemplate.queryForObject(sql, new UserDtoMapper(), id);
             return user;
@@ -116,7 +116,7 @@ public class UserRepository {
     //Получить всех
     public List<UserDto> getUsers() {
         log.info("Пытаемся получить данные всех пользователей");
-        String sql = "SELECT id, email, login, name, birthday FROM consumer";
+        String sql = "SELECT id, email, login, name, birthday FROM users";
         try {
             // Получаем всех пользователей
             List<UserDto> users = jdbcTemplate.query(sql, new UserDtoMapper());

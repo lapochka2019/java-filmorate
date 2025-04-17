@@ -17,7 +17,7 @@ MERGE INTO friendship_type (id, name) KEY (id) VALUES
 (1,'Не подтверждена'),
 (2,'Подтверждена');
 
-INSERT INTO consumer (email, login, name, birthday) VALUES
+INSERT INTO users (email, login, name, birthday) VALUES
 ('user1@example.com', 'user1_login', 'User One', '1990-05-15'),
 ('user2@example.com', 'user2_login', 'User Two', '1985-12-25'),
 ('user3@example.com', 'user3_login', 'User Three', '1995-07-20'),
