@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -16,14 +17,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Validated
+@AllArgsConstructor
 public class UserController {
 
     UserService userService;
-
-    @Autowired
-    public UserController(UserService service) {
-        this.userService = service;
-    }
 
     //    добавление пользователя
     @PostMapping()
@@ -50,7 +47,7 @@ public class UserController {
 
     //    получение всех пользователей
     @GetMapping()
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<UserDto>> getUsers() {
         log.info("Получение всех пользователей");
         return ResponseEntity.ok(userService.getUsers());
     }
@@ -70,13 +67,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public ResponseEntity<List<User>> getFriends(@PathVariable int id) {
+    public ResponseEntity<List<UserDto>> getFriends(@PathVariable int id) {
         log.info("Получение всех друзей пользователя с id = {}", id);
         return ResponseEntity.ok(userService.getFriends(id));
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<List<User>> getFriends(@PathVariable int id, @PathVariable int otherId) {
+    public ResponseEntity<List<UserDto>> getFriends(@PathVariable int id, @PathVariable int otherId) {
         log.info("Получение общих друзей пользователей с id {} и {}", id, otherId);
         return ResponseEntity.ok(userService.getMutualFriends(id, otherId));
     }
