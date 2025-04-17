@@ -90,9 +90,9 @@ public class LikesRepository {
     }
 
     private boolean isUserExists(int userId) {
-        log.info("Проверяем, существует ли пользователь с ID {}", userId);
-        String sql = "SELECT EXISTS(SELECT 1 FROM consumer WHERE id=?);";
-        return jdbcTemplate.queryForObject(sql, Boolean.class, userId);
+        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 
     public void removeLike(int filmId, int userId) {
