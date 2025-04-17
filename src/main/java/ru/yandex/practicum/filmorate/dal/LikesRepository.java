@@ -90,7 +90,7 @@ public class LikesRepository {
     }
 
     private boolean isUserExists(int userId) {
-        String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         return count != null && count > 0;
     }
