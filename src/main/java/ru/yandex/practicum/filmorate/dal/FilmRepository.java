@@ -29,7 +29,7 @@ public class FilmRepository {
     private final MpaRepository mpaRepository;
 
     public void addFilm(Film film) {
-        checkMpaRating(film.getMpa().getId());
+        checkMpaRatingExists(film.getMpa().getId());
         genresRepository.checkGenres(film.getGenres());
 
         String sql = "INSERT INTO films (name, description, release_date, duration, rate, mpa_rating_id) " +
@@ -83,7 +83,7 @@ public class FilmRepository {
         log.info(film.toString());
         checkFilmExists(film.getId());
         //Проверяем возрастной рейтинг
-        checkMpaRating(film.getMpa().getId());
+        checkMpaRatingExists(film.getMpa().getId());
         genresRepository.checkGenres(film.getGenres());
 
         String sql = "UPDATE films SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=? " +
@@ -219,11 +219,10 @@ public class FilmRepository {
     }
 
     public void checkFilmExists(int filmId) {
-        String sql = "SELECT COUNT(*) FROM films WHERE id = ?";
+        String sql = "SELECT EXISTS(SELECT 1 FROM films WHERE id=?);";
+        Boolean isExists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId);
 
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
-
-        if (count == null || count == 0) {
+        if (!isExists) {
             log.warn("Фильм с ID {} не найден в базе данных", filmId);
             throw new NotFoundException("Фильм с ID " + filmId + " не существует");
         }
@@ -231,10 +230,10 @@ public class FilmRepository {
         log.info("Фильм с ID {} найден в базе данных", filmId);
     }
 
-    private void checkMpaRating(int ratingId) {
-        String sql = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, ratingId);
-        if (count == null || count == 0) {
+    private void checkMpaRatingExists(int ratingId) {
+        String sql = "SELECT EXISTS(SELECT 1 FROM mpa_rating WHERE id=?);";
+        Boolean isExists = jdbcTemplate.queryForObject(sql, Boolean.class, ratingId);
+        if (!isExists) {
             log.error("Пользователь с ID {} не найден", ratingId);
             throw new NotFoundException("Пользователь с ID " + ratingId + " не найден");
         }
