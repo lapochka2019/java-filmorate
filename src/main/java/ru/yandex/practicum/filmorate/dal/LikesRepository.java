@@ -29,7 +29,7 @@ public class LikesRepository {
         for (Integer userId : likes) {
             try {
                 // Проверяем, существует ли пользователь
-                if (!userExists(userId)) {
+                if (!isUserExists(userId)) {
                     log.error("Пользователя с id: {} нет в БД", userId);
                     continue; // Пропускаем этого пользователя
                 }
@@ -67,7 +67,7 @@ public class LikesRepository {
         }
 
         // Проверка существования пользователя
-        if (!userExists(userId)) {
+        if (!isUserExists(userId)) {
             log.error("Пользователь с id {} не найден", userId);
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
@@ -89,7 +89,7 @@ public class LikesRepository {
         return count != null && count > 0;
     }
 
-    private boolean userExists(int userId) {
+    private boolean isUserExists(int userId) {
         String sql = "SELECT COUNT(*) FROM consumer WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         return count != null && count > 0;
