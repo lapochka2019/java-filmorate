@@ -32,7 +32,7 @@ public class FilmRepository {
         checkMpaRating(film.getMpa().getId());
         genresRepository.checkGenres(film.getGenres());
 
-        String sql = "INSERT INTO film (name, description, release_date, duration, rate, mpa_rating_id) " +
+        String sql = "INSERT INTO films (name, description, release_date, duration, rate, mpa_rating_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         // Создаем KeyHolder для получения сгенерированного ключа
@@ -86,7 +86,7 @@ public class FilmRepository {
         checkMpaRating(film.getMpa().getId());
         genresRepository.checkGenres(film.getGenres());
 
-        String sql = "UPDATE film SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=? " +
+        String sql = "UPDATE films SET name=?, description=?, release_date=?, duration=?, rate=?, mpa_rating_id=? " +
                 "WHERE id=?";
         try {
             // Выполняем запрос с указанием RETURN_GENERATED_KEYS
@@ -131,7 +131,7 @@ public class FilmRepository {
                     "       m.name AS mpa_name, " +
                     "       LISTAGG(DISTINCT COALESCE(fl.user_id), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
                     "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
-                    "FROM film f " +
+                    "FROM films f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                     "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
@@ -161,7 +161,7 @@ public class FilmRepository {
                     "       m.name AS mpa_name, " +
                     "       LISTAGG(DISTINCT COALESCE(fl.user_id), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
                     "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
-                    "FROM film f " +
+                    "FROM films f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                     "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
@@ -190,7 +190,7 @@ public class FilmRepository {
                     "       m.name AS mpa_name, " +
                     "       LISTAGG(DISTINCT COALESCE(fl.user_id), ',') WITHIN GROUP (ORDER BY fl.user_id) AS likes, " +
                     "       LISTAGG(DISTINCT CONCAT(COALESCE(g.id), ':', COALESCE(g.name, '')), ',') WITHIN GROUP (ORDER BY g.id) AS genres " +
-                    "FROM film f " +
+                    "FROM films f " +
                     "LEFT JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                     "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                     "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
@@ -219,7 +219,7 @@ public class FilmRepository {
     }
 
     public void checkFilmExists(int filmId) {
-        String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM films WHERE id = ?";
 
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
 
@@ -241,7 +241,7 @@ public class FilmRepository {
     }
 
     public void updateRate(int filmId, int rate) {
-        String updateRateSql = "UPDATE film SET rate = ? WHERE id = ?";
+        String updateRateSql = "UPDATE films SET rate = ? WHERE id = ?";
         try {
             jdbcTemplate.update(updateRateSql, rate, filmId);
             log.info("Значение поля rate актуализировано");
@@ -252,7 +252,7 @@ public class FilmRepository {
 
     public void increaseRate(int filmId) {
         // Увеличиваем количество лайков
-        String updateRateSql = "UPDATE film SET rate = rate + 1 WHERE id = ?";
+        String updateRateSql = "UPDATE films SET rate = rate + 1 WHERE id = ?";
         try {
             jdbcTemplate.update(updateRateSql, filmId);
             log.info("Значение поля rate актуализировано");
@@ -263,7 +263,7 @@ public class FilmRepository {
 
     public void decreaseRate(int filmId) {
         // Уменьшаем количество лайков
-        String updateRateSql = "UPDATE film SET rate = GREATEST(rate - 1, 0) WHERE id = ?";
+        String updateRateSql = "UPDATE films SET rate = GREATEST(rate - 1, 0) WHERE id = ?";
         try {
             jdbcTemplate.update(updateRateSql, filmId);
             log.info("Значение поля rate актуализировано");

@@ -24,7 +24,7 @@ public class GenresRepository {
     public List<Genre> getGenresByFilm(int id) {
         log.info("Получаем список жанров для фильма ID {}", id);
         String sql = "SELECT g.id AS genre_id, g.name AS genre_name " +
-                "FROM film f " +
+                "FROM films f " +
                 "JOIN film_genres fg ON f.id = fg.film_id " +
                 "JOIN genre g ON fg.genre_id = g.id " +
                 "WHERE f.id = ?";

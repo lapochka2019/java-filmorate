@@ -84,7 +84,7 @@ public class LikesRepository {
     }
 
     private boolean filmExists(int filmId) {
-        String sql = "SELECT COUNT(*) FROM film WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM films WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
         return count != null && count > 0;
     }

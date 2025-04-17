@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS film_genres;
 DROP TABLE IF EXISTS user_friends;
 
 -- Удаление таблиц с внешними ключами
-DROP TABLE IF EXISTS film;
+DROP TABLE IF EXISTS films;
 DROP TABLE IF EXISTS users;
 
 -- Удаление независимых таблиц
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Создание таблицы Film
-CREATE TABLE IF NOT EXISTS film (
+CREATE TABLE IF NOT EXISTS films (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(200),
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS film_likes (
     film_id INT,
     user_id INT,
     PRIMARY KEY (film_id, user_id),
-    FOREIGN KEY (film_id) REFERENCES film(id),
+    FOREIGN KEY (film_id) REFERENCES films(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS film_genres (
     film_id INT,
     genre_id INT,
     PRIMARY KEY (film_id, genre_id),
-    FOREIGN KEY (film_id) REFERENCES film(id),
+    FOREIGN KEY (film_id) REFERENCES films(id),
     FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
 

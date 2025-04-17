@@ -31,7 +31,7 @@ INSERT INTO user_friends (user_id, friend_id, friendship_type_id) VALUES
 (2, 4, 2), -- User Two и User Four (дружба подтверждена)
 (3, 4, 1); -- User Two и User Four (дружба подтверждена)
 
-INSERT INTO film (name, description, release_date, duration, mpa_rating_id) VALUES
+INSERT INTO films (name, description, release_date, duration, mpa_rating_id) VALUES
 ('Фильм 1', 'Описание фильма 1', '2020-01-15', 120, 1), -- Рейтинг G
 ('Фильм 2', 'Описание фильма 2', '2019-06-20', 95, 2),  -- Рейтинг PG
 ('Фильм 3', 'Описание фильма 3', '2021-03-10', 150, 3), -- Рейтинг PG-13
